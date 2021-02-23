@@ -28,11 +28,17 @@ void EventLoop::Loop()
 	while (looping_)
 	{
 		active_channels_.clear();
-		looping_ = multiplexing_base_->LoopOnce(20, &active_channels_);
+
+		multiplexing_base_->LoopOnce(20, &active_channels_);
 
 		HandleActiveChannel();
 		HandlePendingFunc();
 	}
+}
+
+void EventLoop::Stop()
+{
+	looping_ = false;
 }
 
 void EventLoop::Update(Channel* channel)

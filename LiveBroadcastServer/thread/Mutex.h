@@ -21,16 +21,16 @@ private:
 	pthread_mutex_t mutex_;
 };
 
-class MutexGuardLock
+class MutexLockGuard
 {
 public:
-	explicit MutexGuardLock(Mutex& mutex):
+	explicit MutexLockGuard(Mutex& mutex):
 		mutex_(mutex)
 	{
 		mutex.Lock();
 	}
 
-	~MutexGuardLock()
+	~MutexLockGuard()
 	{
 		mutex_.Unlock();
 	}
@@ -39,5 +39,5 @@ private:
 	Mutex& mutex_;
 };
 
-#define MutexGuardLock(x) error "missing guard object name"
+#define MutexLockGuard(x) error "missing guard object name"
 #endif //LIVEBROADCASTSERVER_MUTEX_H

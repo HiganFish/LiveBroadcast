@@ -46,7 +46,7 @@ void ThreadPool::Start()
 void ThreadPool::Stop()
 {
 	{
-		MutexGuardLock lock(mutex_);
+		MutexLockGuard lock(mutex_);
 		started_ = false;
 		cond_.WakeUpAll();
 	}
@@ -65,7 +65,7 @@ void ThreadPool::Run(const ThreadPool::TaskFunc& task)
 	else
 	{
 		{
-			MutexGuardLock lock(mutex_);
+			MutexLockGuard lock(mutex_);
 			task_deque_.push_back(task);
 			cond_.WakeUpOne();
 		}
@@ -86,8 +86,8 @@ void ThreadPool::ThreadFunction()
 
 ThreadPool::TaskFunc ThreadPool::TakeATask()
 {
-	MutexGuardLock lock(mutex_);
-	while (started_ && task_deque_.empty())
+	MutexLockGuard lock(mutex_);
+	while (started_ && task_deque_.empty()) // 防止虚假唤醒
 	{
 		cond_.Wait(); // 线程池启动后且没有任务 则等待
 	}

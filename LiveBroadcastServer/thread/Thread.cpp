@@ -13,7 +13,9 @@ void* ThreadAttr::ThreadFunction(void* arg)
 		ThreadAttr* attr = static_cast<ThreadAttr*>(arg);
 		if (attr)
 		{
+			LOG_INFO("thread: %s started", attr->name.c_str());
 			attr->func();
+			LOG_INFO("thread: %s stopped", attr->name.c_str());
 		}
 	}
 	return nullptr;

@@ -15,9 +15,14 @@ public:
 
 	void Loop();
 
+	void Stop();
+
 	void Update(Channel* channel);
 
 	void RunInLoop(const EventLoopFunction& function);
+
+	EventLoop(const EventLoop& loop) = delete;
+	EventLoop& operator=(const EventLoop& loop) = delete;
 private:
 
 	MultiplexingBase* multiplexing_base_;

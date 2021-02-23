@@ -27,6 +27,8 @@ set(NETWORK_SRCS
         network/protocol/RtmpClientConnection.cpp
 		network/TcpClient.cpp
 		network/Connector.cpp
+		network/EventLoopThread.cpp
+		network/EventLoopThreadPool.cpp
 		)
 
 set(UTILS_SRCS
@@ -74,32 +76,38 @@ set(ALL_SRCS_NO_DB
 
 # 后续会修改为模块化 因为过早模块化 会导致每次修改代码后需要rebuild才能更新 故临时使用这种方式
 
-add_executable(RtmpManagerTest utils/codec/test/RtmpManagerTest.cpp ${UTILS_SRCS} ${UTILS_HEADERS})
 
 add_executable(LiveBroadcastServer main.cpp ${ALL_SRCS})
 target_link_libraries(LiveBroadcastServer mysqlclient)
 
-add_executable(LiveBroadcastServerTest test/MainTest.cpp ${ALL_SRCS_NO_DB})
-target_link_libraries(LiveBroadcastServerTest mysqlclient)
-
-add_executable(LoggerTest ${UTILS_SRCS})
-
-add_executable(TcpServerTest network/test/TcpServerTest.cpp ${ALL_SRCS_NO_DB})
-
-add_executable(ConnectorTest network/test/ConnectorTest.cpp ${ALL_SRCS_NO_DB})
-
-add_executable(ThreadTest thread/test/ThreadTest.cpp ${ALL_SRCS_NO_DB})
-target_link_libraries(ThreadTest pthread)
-
 if(WIN32)
 	target_link_libraries(LiveBroadcastServer ws2_32)
-	target_link_libraries(TcpServerTest ws2_32)
-	target_link_libraries(ConnectorTest ws2_32)
 endif()
 
 
-add_executable(DbMysqlTest mysql/test/DbMysqlTest.cpp ${DB_MYSQL_SRC})
-target_link_libraries(DbMysqlTest mysqlclient)
+if(OFF)
+	add_executable(DbMysqlTest mysql/test/DbMysqlTest.cpp ${DB_MYSQL_SRC})
+	target_link_libraries(DbMysqlTest mysqlclient)
+	add_executable(UserMapperTest mapper/test/UserMapperTest.cpp ${DB_MYSQL_SRC} ${MAPPER_SRCS} ${UTILS_SRCS})
+	target_link_libraries(UserMapperTest mysqlclient)
 
-add_executable(UserMapperTest mapper/test/UserMapperTest.cpp ${DB_MYSQL_SRC} ${MAPPER_SRCS} ${UTILS_SRCS})
-target_link_libraries(UserMapperTest mysqlclient)
+	add_executable(RtmpManagerTest utils/codec/test/RtmpManagerTest.cpp ${UTILS_SRCS} ${UTILS_HEADERS})
+	add_executable(LoggerTest utils/test/LoggerTest.cpp ${UTILS_SRCS})
+
+	add_executable(LiveBroadcastServerTest test/MainTest.cpp ${ALL_SRCS_NO_DB})
+	target_link_libraries(LiveBroadcastServerTest mysqlclient)
+
+	add_executable(ThreadTest thread/test/ThreadTest.cpp ${ALL_SRCS_NO_DB})
+	target_link_libraries(ThreadTest pthread)
+
+	add_executable(TcpServerTest network/test/TcpServerTest.cpp ${ALL_SRCS_NO_DB})
+	add_executable(ConnectorTest network/test/ConnectorTest.cpp ${ALL_SRCS_NO_DB})
+
+	if(WIN32)
+		target_link_libraries(TcpServerTest ws2_32)
+		target_link_libraries(ConnectorTest ws2_32)
+	endif()
+endif()
+
+add_executable(EventLoopThreadTest network/test/EventLoopThreadTest.cpp ${ALL_SRCS_NO_DB})
+target_link_libraries(EventLoopThreadTest pthread)
