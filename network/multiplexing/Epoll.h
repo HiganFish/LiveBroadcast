@@ -14,7 +14,7 @@ public:
 	typedef std::vector<epoll_event> EventVector;
 	Epoll();
 
-	bool LoopOnce(int timeout, ChannelVector* active_channels) override;
+	void LoopOnce(int timeout, ChannelVector* active_channels) override;
 
 	void UpdateChannel(Channel *channel) override;
 

@@ -2,7 +2,7 @@
 // Created by rjd67 on 2020/12/27.
 //
 #include <cstdio>
-#include "../DbMysql.h"
+#include "mysql/DbMysql.h"
 #include "utils/Logger.h"
 
 int main()

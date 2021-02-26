@@ -127,8 +127,11 @@ int main(int argc, char* argv[])
 
 	main_server.SetConnectionCallback(OnConnection);
 	client_server.SetNewMessageCallback(OnClientMessage);
+
+	main_server.SetThreadNum(2);
+	client_server.SetThreadNum(2);
+
 	main_server.Start();
 	client_server.Start();
-
 	loop.Loop();
 }

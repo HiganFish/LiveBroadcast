@@ -1,4 +1,5 @@
 #include "network/TcpConnection.h"
+#include "network/EventLoop.h"
 #include "utils/Logger.h"
 
 TcpConnection::TcpConnection(EventLoop* loop, const std::string& connection_name, SOCKET sockfd,
@@ -146,6 +147,77 @@ bool TcpConnection::Connected() const
 
 void TcpConnection::Send(const char* data, size_t length)
 {
+	if (connection_status_ == CONNECTED)
+	{
+		if (loop_->IsInLoopThread())
+		{
+			SendInLoop(data, length);
+		}
+		else
+		{
+			void (TcpConnection::*fp)(const std::string_view&) = &TcpConnection::SendInLoop;
+			loop_->RunInLoop(std::bind(fp,
+					this,
+					std::string(data, length)));
+		}
+	}
+}
+
+void TcpConnection::Send(const uint8_t* data, size_t length)
+{
+	return Send(reinterpret_cast<const char*>(data), length);
+}
+
+void TcpConnection::Send(const Buffer* buffer)
+{
+	return Send(buffer->ReadBegin(), buffer->ReadableLength());
+}
+
+void TcpConnection::Send(const std::string& data)
+{
+	return Send(data.c_str(), data.length());
+}
+
+void TcpConnection::Shutdown()
+{
+	if (connection_status_ == CONNECTED)
+	{
+		/**
+		 * 标记连接为正在关闭 但存在未写完的数据 等写完后再关闭写连接
+		 */
+		connection_status_ = DISCONNECTING;
+		if (!channel_.IsWriting())
+		{
+			sockfd_.ShutdownWrite();
+		}
+	}
+}
+
+bool TcpConnection::HasRemainData() const
+{
+	return send_buffer_.ReadableLength() != 0;
+}
+
+void TcpConnection::ConnectDestroyed()
+{
+	if (connection_status_ == CONNECTED)
+	{
+		connection_status_ = DISCONNECTED;
+		channel_.DisableAll();
+		if (connection_callback_)
+		{
+			connection_callback_(shared_from_this());
+		}
+	}
+}
+
+void TcpConnection::SendInLoop(const std::string_view& str)
+{
+	SendInLoop(str.data(), str.length());
+}
+
+void TcpConnection::SendInLoop(const char* data, size_t length)
+{
 	if (connection_status_ == DISCONNECTED || connection_status_ == DISCONNECTING)
 	{
 		LOG_WARN("disconnected, give up send");
@@ -207,53 +279,4 @@ void TcpConnection::Send(const char* data, size_t length)
 			channel_.EnableWritable();
 		}
 	}
-}
-
-void TcpConnection::Send(const uint8_t* data, size_t length)
-{
-	return Send(reinterpret_cast<const char*>(data), length);
-}
-
-void TcpConnection::Send(const Buffer* buffer)
-{
-	return Send(buffer->ReadBegin(), buffer->ReadableLength());
-}
-
-void TcpConnection::Send(const std::string& data)
-{
-	return Send(data.c_str(), data.length());
-}
-
-void TcpConnection::Shutdown()
-{
-	if (connection_status_ == CONNECTED)
-	{
-		/**
-		 * 标记连接为正在关闭 但存在未写完的数据 等写完后再关闭写连接
-		 */
-		connection_status_ = DISCONNECTING;
-		if (!channel_.IsWriting())
-		{
-			sockfd_.ShutdownWrite();
-		}
-	}
-}
-
-bool TcpConnection::HasRemainData() const
-{
-	return send_buffer_.ReadableLength() != 0;
-}
-
-void TcpConnection::ConnectDestroyed()
-{
-	if (connection_status_ == CONNECTED)
-	{
-		connection_status_ = DISCONNECTED;
-		channel_.DisableAll();
-		if (connection_callback_)
-		{
-			connection_callback_(shared_from_this());
-		}
-	}
-
 }

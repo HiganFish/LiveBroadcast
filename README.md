@@ -1,12 +1,14 @@
 # 项目说明
 
-**使用C++17标准 Windows和Centos平台均使用gcc编译通过正常使用**
+**使用C++20标准 Windows和Centos平台均使用gcc10.1编译通过正常使用**
+
+**最新代码暂未适配Windows v1.0.0 版本支持Windows**
 
 **运行后在两个推流者四个观看者情况下 占用内存6Mb CPU使用极低**
 
 **支持IPV4和IPV6**
 
-服务器端代码量 包含网络部分 6000余行
+服务器端代码量 包含网络部分 5000余行
 
 HttpFlv拉流的播放器目前测试通过PotPlayer, VLC, flv.js
 
@@ -34,8 +36,9 @@ HTTP包装 RTMP解析 FLV解析 参考自网络相关文档
 
 推流者身份鉴定 Mysql查询账号密码(已完成)
 
-多线程支持(开发中)
+多线程支持(开发完成)
 
+完善的日志库(待开发)
 
 # 使用说明
 
@@ -64,7 +67,7 @@ if (!user_mapper_.Initialize(
 ```shell
 git clone https://github.com/HiganFish/LiveBroadcast.git
 
-cd LiveBroadcast/LiveBroadcastServer/
+cd LiveBroadcast/
 
 mkdir build && cd build
 
@@ -246,26 +249,22 @@ Obs发送`Video Data`其中Data为sps_pps_tag的data部分  视频数据包
 
 之后便是正常画面声音的Flv数据发送.
 
-# 文件介绍
+# 文件说明
+
 ```
-.
-├── CMakeLists.txt	总配置文件
-├── main.cpp	服务器端启动文件
-├── mapper 持久层
-│   ├── test
-│   │   └── UserMapperTest.cpp
-│   ├── UserMapper.cpp	提供根据账号查询密码功能
+├── CMakeLists.txt
+├── main.cpp
+├── mapper 包装mysql 提供用户验证
+│   ├── UserMapper.cpp
 │   └── UserMapper.h
-├── mysql mysql包装
+├── mysql   包装基础mysql api
 │   ├── DbMysql.cpp
 │   ├── DbMysql.h
 │   ├── Field.cpp
 │   ├── Field.h
 │   ├── QueryResult.cpp
-│   ├── QueryResult.h
-│   └── test
-│       └── DbMysqlTest.cpp
-├── network		网络层代码
+│   └── QueryResult.h
+├── network 网络相关
 │   ├── Acceptor.cpp
 │   ├── Acceptor.h
 │   ├── Callback.h
@@ -275,63 +274,91 @@ Obs发送`Video Data`其中Data为sps_pps_tag的data部分  视频数据包
 │   ├── Connector.h
 │   ├── EventLoop.cpp
 │   ├── EventLoop.h
+│   ├── EventLoopThread.cpp
+│   ├── EventLoopThread.h
+│   ├── EventLoopThreadPool.cpp
+│   ├── EventLoopThreadPool.h
 │   ├── InetAddress.cpp
 │   ├── InetAddress.h
-│   ├── multiplexing	多路复用包装
+│   ├── multiplexing 多路复用
 │   │   ├── Epoll.cpp
 │   │   ├── Epoll.h
 │   │   ├── MultiplexingBase.cpp
 │   │   ├── MultiplexingBase.h
 │   │   ├── Select.cpp
 │   │   └── Select.h
-│   ├── PlatformNetwork.cpp		网络跨平台代码
+│   ├── PlatformNetwork.cpp 跨平台相关
 │   ├── PlatformNetwork.h
-│   ├── protocol	Rtmp推流者和HttpFlv拉流者包装
+│   ├── protocol Rtmp和HttpFlv连接管理
 │   │   ├── RtmpClientConnection.cpp
 │   │   ├── RtmpClientConnection.h
 │   │   ├── RtmpServerConnection.cpp
 │   │   └── RtmpServerConnection.h
 │   ├── Socket.cpp
 │   ├── Socket.h
-│   ├── SocketOps.cpp 基础socketApi包装
+│   ├── SocketOps.cpp
 │   ├── SocketOps.h
 │   ├── TcpClient.cpp
 │   ├── TcpClient.h
 │   ├── TcpConnection.cpp
 │   ├── TcpConnection.h
 │   ├── TcpServer.cpp
-│   ├── TcpServer.h
-│   └── test
-│       ├── ConnectorTest.cpp
-│       └── TcpServerTest.cpp
+│   └── TcpServer.h
+├── README.md
+├── test 测试文件
+│   ├── CMakeLists.txt
+│   ├── Connector
+│   │   └── ConnectorTest.cpp
+│   ├── DbMysql
+│   │   └── DbMysqlTest.cpp
+│   ├── EventLoopThread
+│   │   └── EventLoopThreadTest.cpp
+│   ├── Logger
+│   │   └── LoggerTest.cpp
+│   ├── Main
+│   │   ├── 2.data.back
+│   │   └── MainTest.cpp
+│   ├── TcpServer
+│   │   └── TcpServerTest.cpp
+│   ├── Thread
+│   │   └── ThreadTest.cpp
+│   └── UserMapper
+│       ├── live_user.sql
+│       └── UserMapperTest.cpp
+├── thread 线程库包装
+│   ├── Condition.cpp
+│   ├── Condition.h
+│   ├── CurrentThread.cpp
+│   ├── CurrentThread.h
+│   ├── Mutex.cpp
+│   ├── Mutex.h
+│   ├── Thread.cpp
+│   ├── Thread.h
+│   ├── ThreadPool.cpp
+│   └── ThreadPool.h
 └── utils
-    ├── Buffer.cpp 通用缓冲类
-    ├── Buffer.h
-    ├── codec	Flv Rtmp编解码器
-    │   ├── FlvCodec.cpp
-    │   ├── FlvCodec.h
-    │   ├── FlvManager.cpp
-    │   ├── FlvManager.h
-    │   ├── RtmpCodec.cpp
-    │   ├── RtmpCodec.h
-    │   ├── RtmpManager.cpp
-    │   ├── RtmpManager.h
-    │   └── test
-    │       ├── FlvManagerTest.cpp
-    │       └── RtmpManagerTest.cpp
-    ├── File.cpp
-    ├── File.h
-    ├── Format.cpp
-    ├── Format.h
-    ├── Logger.cpp
-    ├── Logger.h
-    ├── PlatformBase.cpp 基础跨平台
-    ├── PlatformBase.h
-    ├── test
-    │   └── LoggerTest.cpp
-    ├── Timestamp.cpp
-    └── Timestamp.h
+├── Buffer.cpp
+├── Buffer.h
+├── codec Rtmp和Flv的编解码器
+│   ├── FlvCodec.cpp
+│   ├── FlvCodec.h
+│   ├── FlvManager.cpp
+│   ├── FlvManager.h
+│   ├── RtmpCodec.cpp
+│   ├── RtmpCodec.h
+│   ├── RtmpManager.cpp
+│   ├── RtmpManager.h
+│   └── test
+│       ├── FlvManagerTest.cpp
+│       └── RtmpManagerTest.cpp
+├── File.cpp
+├── File.h
+├── Format.cpp
+├── Format.h
+├── Logger.cpp
+├── Logger.h
+├── PlatformBase.cpp 基础跨平台相关
+├── PlatformBase.h 基础跨平台相关
+├── Timestamp.cpp
+└── Timestamp.h
 ```
-
-
-

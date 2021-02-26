@@ -13,32 +13,27 @@ Epoll::Epoll() :
 
 }
 
-bool Epoll::LoopOnce(int timeout, ChannelVector* active_channels)
+void Epoll::LoopOnce(int timeout, ChannelVector* active_channels)
 {
 	int ret = ::epoll_wait(epfd_, event_vector_.data(), event_vector_.size(), timeout);
 
 	if (ret == -1)
 	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
+		if (errno != EINTR)
 		{
-			return true;
-		}
-		else if (errno == EINTR)
-		{
-			return true;
-		}
-		LOG_ERROR("error signal: %d", errno);
+			LOG_ERROR("error signal: %d", errno);
 
-		return false;
+			exit(-1);
+		}
 	}
 	else if (ret == 0)
 	{
-		return true;
+
 	}
 	else
 	{
 		FillActiveSocketVector(ret, active_channels);
-		return true;
+
 	}
 }
 
