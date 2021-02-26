@@ -7,7 +7,8 @@ TcpServer::TcpServer(EventLoop* loop, const std::string& server_name, const Inet
 	server_name_(server_name),
 	server_address_(address),
 	acceptor_(loop, server_name, address),
-	connection_id_(0)
+	connection_id_(0),
+	thread_pool_(std::make_unique<EventLoopThreadPool>(loop, server_name))
 {
 	acceptor_.SetNewConnectionCallback(std::bind(&TcpServer::OnNewConnection, this, _1, _2));
 }
@@ -23,6 +24,8 @@ TcpServer::~TcpServer()
 
 void TcpServer::Start()
 {
+	thread_pool_->Start();
+
 	LOG_INFO("server: %s listen on %s",
 			server_name_.c_str(), server_address_.ToIpPort().c_str())
 	acceptor_.Listen();
@@ -44,7 +47,9 @@ void TcpServer::OnNewConnection(SOCKET sockfd, const InetAddress& address)
 	snprintf(buffer, sizeof buffer, "-%s#%d", address.ToIpPort().c_str(), connection_id_++);
 	std::string connection_name = server_name_ + buffer;
 
-	TcpConnectionPtr connection_ptr = std::make_shared<TcpConnection>(loop_, connection_name,
+	EventLoop* io_loop = thread_pool_->GetNextLoop();
+
+	TcpConnectionPtr connection_ptr = std::make_shared<TcpConnection>(io_loop, connection_name,
 			sockfd, address);
 	connection_ptr->SetNewMessageCallback(newmessage_callback_);
 	connection_ptr->SetWriteCompleteCallback(write_complete_callback_);
@@ -55,12 +60,18 @@ void TcpServer::OnNewConnection(SOCKET sockfd, const InetAddress& address)
 
 	LOG_INFO("create a new connection: %s", connection_name.c_str());
 
-	connection_ptr->Established(); // TODO Run in loop
+	io_loop->RunInLoop(
+			std::bind(&TcpConnection::Established, connection_ptr));
 }
 
 void TcpServer::SetNewMessageCallback(const NewMessageCallback& callback)
 {
 	newmessage_callback_ = callback;
+}
+
+void TcpServer::SetThreadNum(int num)
+{
+	thread_pool_->SetThreadNum(num);
 }
 
 void TcpServer::OnCloseConnection(const TcpConnectionPtr& connection_ptr)

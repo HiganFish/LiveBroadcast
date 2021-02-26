@@ -14,7 +14,7 @@ public:
 	MultiplexingBase();
 	virtual ~MultiplexingBase();
 
-	virtual bool LoopOnce(int timeout, ChannelVector* active_channels);
+	virtual void LoopOnce(int timeout, ChannelVector* active_channels);
 
 	virtual void UpdateChannel(Channel *channel);
 };
