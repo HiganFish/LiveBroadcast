@@ -17,7 +17,7 @@ void Func()
 
 int main()
 {
-	ThreadPool pool("test thread pool");
+	ThreadPool pool("UserMapper thread pool");
 
 	pool.SetThreadNum(5);
 

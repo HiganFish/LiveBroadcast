@@ -13,7 +13,7 @@ int main()
 {
 	EventLoop loop;
 
-	EventLoopThreadPool pool(&loop, "test pool");
+	EventLoopThreadPool pool(&loop, "UserMapper pool");
 	pool.SetThreadNum(4);
 
 	pool.Start();

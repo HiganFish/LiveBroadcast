@@ -51,7 +51,7 @@ set(DB_MYSQL_SRC
 
 set(MAPPER_SRCS
 		mapper/UserMapper.cpp
-)
+		)
 
 set(THREAD_SRCS
 		thread/Thread.cpp
@@ -60,54 +60,38 @@ set(THREAD_SRCS
 		thread/Condition.cpp
 		)
 
-set(ALL_SRCS
-		${NETWORK_SRCS}
+set(BASE_SRCS
 		${UTILS_SRCS}
-		${DB_MYSQL_SRC}
-		${MAPPER_SRCS}
 		${THREAD_SRCS}
 )
 
-set(ALL_SRCS_NO_DB
+set(NETWORK_SRCS
 		${NETWORK_SRCS}
-		${UTILS_SRCS}
-		${THREAD_SRCS}
 		)
 
-# 后续会修改为模块化 因为过早模块化 会导致每次修改代码后需要rebuild才能更新 故临时使用这种方式
+set(DB_SRCS
+		${DB_MYSQL_SRC}
+		${MAPPER_SRCS}
+		)
 
+add_library(lbs_base_lib ${BASE_SRCS})
+target_link_libraries(lbs_base_lib pthread)
 
-add_executable(LiveBroadcastServer main.cpp ${ALL_SRCS})
-target_link_libraries(LiveBroadcastServer mysqlclient)
-
+add_library(lbs_net_lib ${NETWORK_SRCS})
+target_link_libraries(lbs_net_lib lbs_base_lib)
 if(WIN32)
-	target_link_libraries(LiveBroadcastServer ws2_32)
+	target_link_libraries(lbs_net_lib ws2_32)
 endif()
 
+add_library(lbs_db_lib ${DB_SRCS})
+target_link_libraries(lbs_db_lib mysqlclient)
+target_link_libraries(lbs_db_lib lbs_base_lib)
 
-if(OFF)
-	add_executable(DbMysqlTest mysql/test/DbMysqlTest.cpp ${DB_MYSQL_SRC})
-	target_link_libraries(DbMysqlTest mysqlclient)
-	add_executable(UserMapperTest mapper/test/UserMapperTest.cpp ${DB_MYSQL_SRC} ${MAPPER_SRCS} ${UTILS_SRCS})
-	target_link_libraries(UserMapperTest mysqlclient)
+add_executable(LiveBroadcastServer main.cpp)
+target_link_libraries(LiveBroadcastServer lbs_net_lib)
+target_link_libraries(LiveBroadcastServer lbs_db_lib)
 
-	add_executable(RtmpManagerTest utils/codec/test/RtmpManagerTest.cpp ${UTILS_SRCS} ${UTILS_HEADERS})
-	add_executable(LoggerTest utils/test/LoggerTest.cpp ${UTILS_SRCS})
-
-	add_executable(LiveBroadcastServerTest test/MainTest.cpp ${ALL_SRCS_NO_DB})
-	target_link_libraries(LiveBroadcastServerTest mysqlclient)
-
-	add_executable(ThreadTest thread/test/ThreadTest.cpp ${ALL_SRCS_NO_DB})
-	target_link_libraries(ThreadTest pthread)
-
-	add_executable(TcpServerTest network/test/TcpServerTest.cpp ${ALL_SRCS_NO_DB})
-	add_executable(ConnectorTest network/test/ConnectorTest.cpp ${ALL_SRCS_NO_DB})
-
-	if(WIN32)
-		target_link_libraries(TcpServerTest ws2_32)
-		target_link_libraries(ConnectorTest ws2_32)
-	endif()
+option(LBS_WITH_TEST "Compile LiveBroadcastServer Test" OFF)
+if(LBS_WITH_TEST)
+	add_subdirectory(test)
 endif()
-
-add_executable(EventLoopThreadTest network/test/EventLoopThreadTest.cpp ${ALL_SRCS_NO_DB})
-target_link_libraries(EventLoopThreadTest pthread)
