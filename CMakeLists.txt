@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project("LiveBroadcastServer")
 
-set(CMAKE_CXX_FLAGS "-Wall -Werror -std=c++17 -g -o0")
+set(CMAKE_CXX_FLAGS "-Wall -Werror -std=c++2a -g -o0")
 
 include_directories(${CMAKE_SOURCE_DIR})
 
@@ -58,6 +58,7 @@ set(THREAD_SRCS
 		thread/ThreadPool.cpp
 		thread/Mutex.cpp
 		thread/Condition.cpp
+		thread/CurrentThread.cpp
 		)
 
 set(BASE_SRCS

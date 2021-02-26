@@ -3,11 +3,14 @@
 #include "network/multiplexing/MultiplexingBase.h"
 #include "network/multiplexing/Epoll.h"
 #include "network/multiplexing/Select.h"
+#include "thread/CurrentThread.h"
 
 EventLoop::EventLoop() :
 	multiplexing_base_(nullptr),
 	active_channels_(),
-	looping_(false)
+	looping_(false),
+	thread_tid_(CurrentThread::GetTid()),
+	pending_func_mutex_()
 {
 #ifdef _WIN32
 	multiplexing_base_ = new Select;
@@ -57,14 +60,30 @@ void EventLoop::HandleActiveChannel()
 
 void EventLoop::RunInLoop(const EventLoop::EventLoopFunction& function)
 {
-	pending_func_.push_back(function);
+	{
+		MutexLockGuard guard(pending_func_mutex_);
+		pending_func_.push_back(function);
+	}
+}
+
+bool EventLoop::IsInLoopThread() const
+{
+	return CurrentThread::GetTid() == thread_tid_;
 }
 
 void EventLoop::HandlePendingFunc()
 {
-	for (auto& func : pending_func_)
+	std::vector<EventLoopFunction> pending_func;
+	{
+		/**
+		 * 减少锁持有的时间
+		 */
+		MutexLockGuard guard(pending_func_mutex_);
+		pending_func.swap(pending_func_);
+	}
+
+	for (auto& func : pending_func)
 	{
 		func();
 	}
-	pending_func_.clear();
 }

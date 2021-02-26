@@ -2,6 +2,7 @@
 #define NETWORK_TCPCONNECTION_H
 
 #include <string>
+#include <string_view>
 #include "network/Socket.h"
 #include "network/Channel.h"
 #include "network/Callback.h"
@@ -102,6 +103,9 @@ private:
 	 * 关闭连接
 	 */
 	void OnClose();
+
+	void SendInLoop(const char* data, size_t length);
+	void SendInLoop(const std::string_view& str);
 };
 
 #endif // !NETWORK_TCPCONNECTION_H

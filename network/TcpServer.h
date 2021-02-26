@@ -7,6 +7,7 @@
 
 #include "network/TcpConnection.h"
 #include "network/Acceptor.h"
+#include "network/EventLoopThreadPool.h"
 
 class TcpServer
 {
@@ -25,6 +26,8 @@ public:
 
 	void SetNewMessageCallback(const NewMessageCallback& callback);
 
+	void SetThreadNum(int num);
+
 private:
 	EventLoop* loop_;
 
@@ -41,6 +44,8 @@ private:
 	TcpConnectionMap connection_map_;
 
 	int connection_id_;
+
+	std::unique_ptr<EventLoopThreadPool> thread_pool_;
 
 	void OnNewConnection(SOCKET sockfd, const InetAddress& address);
 
