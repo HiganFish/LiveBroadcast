@@ -40,6 +40,7 @@ set(UTILS_SRCS
 		utils/File.cpp
 		utils/Timestamp.cpp
 		utils/Logger.cpp
+		utils/LoggerStream.cpp
 		utils/Format.cpp
 		)
 
@@ -88,11 +89,10 @@ add_library(lbs_db_lib ${DB_SRCS})
 target_link_libraries(lbs_db_lib mysqlclient)
 target_link_libraries(lbs_db_lib lbs_base_lib)
 
-add_executable(LiveBroadcastServer main.cpp)
-target_link_libraries(LiveBroadcastServer lbs_net_lib)
-target_link_libraries(LiveBroadcastServer lbs_db_lib)
+#add_executable(LiveBroadcastServer main.cpp)
+#target_link_libraries(LiveBroadcastServer lbs_net_lib)
+#target_link_libraries(LiveBroadcastServer lbs_db_lib)
 
 option(LBS_WITH_TEST "Compile LiveBroadcastServer Test" OFF)
-if(LBS_WITH_TEST)
-	add_subdirectory(test)
-endif()
+
+add_subdirectory(test)
