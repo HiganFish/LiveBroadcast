@@ -88,8 +88,9 @@ void RtmpServerConnection::DebugParseSize(size_t division)
 	if (read_m != last_write_size_)
 	{
 		last_write_size_ = read_m;
-		LOG_INFO("connection: %s, sum write %zu bytes", connection_ptr_->GetConnectionName().c_str(),
-				rtmp_manager_.GetParsedLength());
+		LOG_INFO << "connection: " << connection_ptr_->GetConnectionName()
+				 << ", sum write " << rtmp_manager_.GetParsedLength()
+				 << " bytes";
 	}
 }
 std::string response_header = "HTTP/1.1 200 OK\r\n"
@@ -125,8 +126,7 @@ void RtmpServerConnection::OnConnectionShakeHand(const TcpConnectionPtr& connect
 		{
 			if (!Authenticate())
 			{
-				LOG_WARN("connection: %s authenticate failed",
-						connection_ptr->GetConnectionName().c_str());
+				LOG_WARN << "connection: " << connection_ptr->GetConnectionName() << " authenticate failed";
 				connection_ptr->Shutdown();
 				/**
 				 * 校验出错时返回
@@ -137,8 +137,9 @@ void RtmpServerConnection::OnConnectionShakeHand(const TcpConnectionPtr& connect
 		}
 		case RtmpServerConnection::SHAKE_SUCCESS:
 		{
-			LOG_INFO("connection: %s shake hand success",
-					connection_ptr->GetConnectionName().c_str());
+			LOG_INFO << "connection: " << connection_ptr->GetConnectionName()
+					 << " shake hand success";
+
 			if (shake_hand_success_callback_)
 			{
 				shake_hand_success_callback_(this);
@@ -157,8 +158,8 @@ void RtmpServerConnection::OnConnectionShakeHand(const TcpConnectionPtr& connect
 		}
 		case RtmpServerConnection::SHAKE_FAILED:
 		{
-			LOG_WARN("connection: %s shake hand failed",
-					connection_ptr->GetConnectionName().c_str());
+			LOG_WARN << "connection: %s " << connection_ptr->GetConnectionName()
+					 << "shake hand failed";
 			connection_ptr->Shutdown();
 			/**
 			 * 出错时返回
@@ -184,8 +185,8 @@ void RtmpServerConnection::AddClientConnection(
 	client_connection_map_[client_connection_ptr->GetConnectionName()]
 		= client_connection_ptr;
 
-	LOG_INFO("server: %s, add a client: %s", connection_ptr_->GetConnectionName().c_str(),
-			client_connection_ptr->GetConnectionName().c_str());
+	LOG_INFO << "server: " << connection_ptr_->GetConnectionName()
+			 << ", add a client: " << GetConnectionName();
 
 	client_connection_ptr->SetCloseConnectionCallback(
 			[this](auto&& PH1){OnConnectionClose(PH1);});
@@ -251,8 +252,8 @@ uint32_t RtmpServerConnection::GetLastHeaderTagCurrentSize() const
 void RtmpServerConnection::OnConnectionClose(const TcpConnectionPtr& connection_ptr)
 {
 	client_connection_map_.erase(connection_ptr->GetConnectionName());
-	LOG_INFO("client: %s, remove from server: %s", connection_ptr->GetConnectionName().c_str(),
-			connection_ptr_->GetConnectionName().c_str());
+	LOG_INFO << "client: " << connection_ptr->GetConnectionName()
+			 << ", remove from server: " << connection_ptr_->GetConnectionName();
 }
 
 bool RtmpServerConnection::Authenticate()

@@ -47,7 +47,9 @@ public:
 	LoggerStream& operator<<(const char* str);
 	LoggerStream& operator<<(char c);
 	LoggerStream& operator<<(const std::string_view& view);
+
 	LoggerStream& operator<<(int);
+	LoggerStream& operator<<(size_t);
 
 	LoggerBuffer& GetBuffer();
 

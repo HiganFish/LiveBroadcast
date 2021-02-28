@@ -89,9 +89,9 @@ add_library(lbs_db_lib ${DB_SRCS})
 target_link_libraries(lbs_db_lib mysqlclient)
 target_link_libraries(lbs_db_lib lbs_base_lib)
 
-#add_executable(LiveBroadcastServer main.cpp)
-#target_link_libraries(LiveBroadcastServer lbs_net_lib)
-#target_link_libraries(LiveBroadcastServer lbs_db_lib)
+add_executable(LiveBroadcastServer main.cpp)
+target_link_libraries(LiveBroadcastServer lbs_net_lib)
+target_link_libraries(LiveBroadcastServer lbs_db_lib)
 
 option(LBS_WITH_TEST "Compile LiveBroadcastServer Test" OFF)
 

@@ -27,7 +27,7 @@ bool OnAuthenticate(const std::string& user, const std::string& passwd)
 //	}
 //	else
 //	{
-//		LOG_WARN("user: %s, use wrong passwd: %s", user.c_str(), passwd.c_str())
+//		LOG_WARN << "user: " << user << ", use wrong passwd: " << passwd;
 //		return false;
 //	}
 
@@ -42,8 +42,8 @@ void OnShakeHandSuccess(RtmpServerConnection* server_connection)
 	 */
 	std::string path = server_connection->GetRtmpPath();
 	rtmp_connection_map[path] = server_connection;
-	LOG_INFO("server: %s bind to %s", server_connection->GetConnectionName().c_str(),
-			path.c_str());
+	LOG_INFO << "server: " << server_connection->GetConnectionName()
+			 << " bind to " << path;
 }
 
 /** 主播建立连接后的回调函数*/
@@ -66,7 +66,8 @@ void OnConnection(const TcpConnectionPtr& connection_ptr)
 					server_connection->OnConnectionShakeHand(PH1, PH2, PH3);
 				});
 
-		LOG_INFO("connection: %s start shake hand", connection_ptr->GetConnectionName().c_str());
+		LOG_INFO << "connection: " << connection_ptr->GetConnectionName()
+				 << " start shake hand";
 	}
 }
 
@@ -83,15 +84,17 @@ void OnClientMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Tim
 
 	if (server_connection)
 	{
-		LOG_INFO("connection: %s, request url: %s success", connection_ptr->GetConnectionName().c_str(),
-				url.c_str());
+		LOG_INFO << "connection: " << connection_ptr->GetConnectionName()
+				 << ", request url: " << url << " success";
+
 		server_connection->AddClientConnection(
 				std::make_shared<RtmpClientConnection>(connection_ptr));
 	}
 	else
 	{
-		LOG_INFO("connection: %s, request url: %s failed", connection_ptr->GetConnectionName().c_str(),
-				url.c_str());
+		LOG_INFO << "connection: "<< connection_ptr->GetConnectionName()
+				 << ", request url: " << url << " failed";
+
 		connection_ptr->Shutdown();
 	}
 }

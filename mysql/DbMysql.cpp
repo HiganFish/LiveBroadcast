@@ -51,8 +51,8 @@ bool DbMysql::Initialize(const std::string& host, const std::string& user, const
 	}
 	else
 	{
-		LOG_ERROR("Failed to connect to database: Error: %s",
-				mysql_error(mysql_));
+		LOG_ERROR << "Failed to connect to database: Error: "
+				<< mysql_error(mysql_);
 
 		mysql_close(mysql_);
 		return false;
@@ -86,7 +86,7 @@ QueryResultPtr DbMysql::Query(const char* sql)
 		}
 	}
 
-	LOG_ERROR("query error: %s", sql);
+	LOG_ERROR << "query error: "<< sql;
 
 	return nullptr;
 }

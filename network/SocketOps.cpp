@@ -111,7 +111,7 @@ bool socketops::NameToAddr4(const std::string& name, in_addr* addr)
 		}
 		else
 		{
-			LOG_ERROR("parse name: %s error", name.c_str());
+			LOG_ERROR << "parse name: " << name << " error";
 			return false;
 		}
 	}
