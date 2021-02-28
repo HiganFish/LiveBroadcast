@@ -17,7 +17,7 @@ TcpConnection::TcpConnection(EventLoop* loop, const std::string& connection_name
 
 TcpConnection::~TcpConnection()
 {
-	LOG_INFO("Connection: %s deconstruct", connection_name_.c_str());
+	LOG_INFO << "Connection: " << connection_name_ << " deconstruct";
 }
 
 void TcpConnection::Established()
@@ -69,7 +69,7 @@ void TcpConnection::OnReadable()
 	}
 	else
 	{
-		LOG_INFO("TcpConnection::OnReadable, error: %s", GetLastErrorAsString().c_str());
+		LOG_INFO << "TcpConnection::OnReadable, error: " << GetLastErrorAsString();
 	}
 }
 
@@ -101,12 +101,12 @@ void TcpConnection::OnWritable()
 		}
 		else
 		{
-			LOG_ERROR("TcpConnection::OnWritable send error when writing");
+			LOG_ERROR << "TcpConnection::OnWritable send error when writing";
 		}
 	}
 	else
 	{
-		LOG_WARN("TcpConnection::OnWritable not writing");
+		LOG_WARN << "TcpConnection::OnWritable not writing";
 	}
 }
 
@@ -220,7 +220,7 @@ void TcpConnection::SendInLoop(const char* data, size_t length)
 {
 	if (connection_status_ == DISCONNECTED || connection_status_ == DISCONNECTING)
 	{
-		LOG_WARN("disconnected, give up send");
+		LOG_WARN << "disconnected, give up send";
 		return;
 	}
 

@@ -17,7 +17,7 @@ TcpServer::~TcpServer()
 {
 	for (auto [connection_name, connection_ptr] : connection_map_)
 	{
-		LOG_INFO("close connection: %s", connection_name.c_str());
+		LOG_INFO << "close connection: %s" << connection_name;
 		// connection_ptr->Destroy();
 	}
 }
@@ -26,8 +26,8 @@ void TcpServer::Start()
 {
 	thread_pool_->Start();
 
-	LOG_INFO("server: %s listen on %s",
-			server_name_.c_str(), server_address_.ToIpPort().c_str())
+	LOG_INFO << "server: " << server_name_
+			 << " listen on " <<  server_address_.ToIpPort();
 	acceptor_.Listen();
 }
 
@@ -58,7 +58,7 @@ void TcpServer::OnNewConnection(SOCKET sockfd, const InetAddress& address)
 
 	connection_map_[connection_name] = connection_ptr;
 
-	LOG_INFO("create a new connection: %s", connection_name.c_str());
+	LOG_INFO << "create a new connection: " << connection_name;
 
 	io_loop->RunInLoop(
 			std::bind(&TcpConnection::Established, connection_ptr));
@@ -78,6 +78,6 @@ void TcpServer::OnCloseConnection(const TcpConnectionPtr& connection_ptr)
 {
 	std::string connection_name = connection_ptr->GetConnectionName();
 
-	LOG_INFO("erase a connection: %s", connection_name.c_str());
+	LOG_INFO << "erase a connection: " << connection_name;
 	connection_map_.erase(connection_name);
 }

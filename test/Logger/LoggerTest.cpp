@@ -5,7 +5,19 @@
 
 int main()
 {
-	LOG_INFO("LOG_INFO %d, %s", 1, "11111");
-	LOG_WARN("LOG_WARN %d, %s", 1, "11111");
-	LOG_ERROR("LOG_ERROR %d, %s", 1, "11111");
+	Logger::SetLogLevel(Logger::DEBUG);
+
+	LOG_DEBUG << "123";
+	LOG_INFO << "123";
+	LOG_WARN << "123";
+	LOG_ERROR << "123";
+
+	Logger::SetLogLevel(Logger::WARN);
+
+	LOG_DEBUG << "123";
+	LOG_INFO << "123";
+	LOG_WARN << "123";
+	LOG_ERROR << "123";
+
+	LOG_FATAL << "123";
 }

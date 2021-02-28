@@ -64,7 +64,7 @@ void Channel::HandleEventWithGuard()
 		std::shared_ptr<void> guard = tie_.lock();
 		if (!guard)
 		{
-			LOG_WARN("connection: %s is closed", connection_name.c_str());
+			LOG_WARN << "connection: " << connection_name << " is closed";
 		}
 		else
 		{

@@ -15,7 +15,8 @@ int main()
 	QueryResultPtr result = mysql.Query("SELECT username, password FROM user");
 	do
 	{
-		LOG_INFO("username: %s, password: %s", (*result)["username"].GetCStr(), (*result)["password"].GetCStr());
+		LOG_INFO << "username: " << (*result)["username"].GetCStr()
+				 << ", password: " << (*result)["password"].GetCStr();
 	} while(result->NextRow());
 
 	std::string username = "insert-k";
@@ -27,7 +28,7 @@ int main()
 	bool insert_result = mysql.Execute(sql);
 	if (!insert_result)
 	{
-		LOG_ERROR("Insert error");
+		LOG_ERROR << "Insert error";
 	}
 
 	return 0;

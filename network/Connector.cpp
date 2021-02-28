@@ -46,11 +46,11 @@ void Connector::Connect()
 		case EBADF:
 		case EALREADY:
 			socketops::Close(sockfd);
-			LOG_ERROR("connect error %d", save_errno);
+			LOG_ERROR << "connect error " <<  save_errno;
 			break;
 		default:
 			socketops::Close(sockfd);
-			LOG_ERROR("connect unknown error %d", save_errno);
+			LOG_ERROR << "connect unknown error " << save_errno;
 	}
 }
 
@@ -82,7 +82,7 @@ void Connector::Retry(SOCKET sockfd)
 	status_ = DISCONNECTED;
 	if (connect_)
 	{
-		LOG_INFO("Connector retry connect to %s", server_addr_.ToIpPort().c_str());
+		LOG_INFO << "Connector retry connect to " << server_addr_.ToIpPort();
 	}
 	else
 	{

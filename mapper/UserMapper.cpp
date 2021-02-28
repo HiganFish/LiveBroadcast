@@ -21,14 +21,14 @@ std::string UserMapper::GetPasswdByUser(const std::string& username)
 		{
 			if ((*result)["user"].GetString() == username)
 			{
-				LOG_INFO("user: %s, passwd: %s", username.c_str(), (*result)["passwd"].GetString().c_str());
+				LOG_INFO << "user: " << username << ", passwd: " << (*result)["passwd"].GetString();
 
 				return (*result)["passwd"].GetString();
 			}
 
 		} while (result->NextRow());
 
-		LOG_WARN("cannot find user: %s", username.c_str());
+		LOG_WARN << "cannot find user: ", username.c_str();
 	}
 
 	return "";

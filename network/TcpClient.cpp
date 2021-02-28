@@ -79,7 +79,7 @@ void TcpClient::OnNewConnection(SOCKET sockfd)
 	connection_ptr->SetConnectionCloseCallback([this](auto&& PH1){RemoveConnection(PH1);});
 	// connection_ptr->SetConnectionCloseCallback(std::bind(&TcpClient::RemoveConnection, this, _1));
 
-	LOG_INFO("create a new connection: %s", connection_name.c_str());
+	LOG_INFO << "create a new connection: " << connection_name.c_str();
 
 	connection_ptr_ = connection_ptr;
 	connection_ptr->Established(); // TODO Run in loop
@@ -95,13 +95,13 @@ void TcpClient::RemoveConnection(const TcpConnectionPtr& connection_ptr)
 
 		if (retry_ && connect_)
 		{
-			LOG_INFO("TcpClient[%s] - ReConnecting to %s", client_name_.c_str(),
-					server_addr_.ToIpPort().c_str());
+			LOG_INFO << "TcpClient[" << client_name_ << "] - ReConnecting to "
+					<< server_addr_.ToIpPort();
 			connector_.ReConnect();
 		}
 	}
 	else
 	{
-		LOG_ERROR("Error")
+		LOG_ERROR << "Error";
 	}
 }

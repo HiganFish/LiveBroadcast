@@ -47,7 +47,7 @@ ssize_t RtmpManager::ParseData(Buffer* buffer)
 			}
 			else if (parsed < 0)
 			{
-				LOG_ERROR("ParseHeader error");
+				LOG_ERROR << "ParseHeader error";
 			}
 		}
 
@@ -64,7 +64,7 @@ ssize_t RtmpManager::ParseData(Buffer* buffer)
 			}
 			else if (parsed < 0)
 			{
-				LOG_ERROR("ParseBody error");
+				LOG_ERROR << "ParseBody error";
 			}
 		}
 		else if (parsed_status_ == PARSE_FIRST_HEADER)
@@ -72,7 +72,7 @@ ssize_t RtmpManager::ParseData(Buffer* buffer)
 			parsed = ParseFirstHeader(buffer);
 			if (parsed < 0)
 			{
-				LOG_ERROR("ParseFirstHeader error");
+				LOG_ERROR  << "ParseFirstHeader error";
 			}
 		}
 
