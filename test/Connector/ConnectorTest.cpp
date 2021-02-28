@@ -15,13 +15,14 @@ void OnNewConnection(const TcpConnectionPtr& connection)
 	}
 	else
 	{
-		LOG_INFO("connection: %s close", connection->GetConnectionName().c_str());
+		LOG_INFO << "connection: " << connection->GetConnectionName() << " close";
 	}
 }
 
 void OnNewMessage(const TcpConnectionPtr& connection, Buffer* buffer, Timestamp stamp)
 {
-	LOG_INFO("connection: %s send\n%s", connection->GetConnectionName().c_str(), buffer->ReadAllAsString().c_str());
+	LOG_INFO << "connection: " << connection->GetConnectionName()
+			 << " send\n" << buffer->ReadAllAsString();
 }
 
 int main()

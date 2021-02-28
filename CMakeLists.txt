@@ -40,6 +40,7 @@ set(UTILS_SRCS
 		utils/File.cpp
 		utils/Timestamp.cpp
 		utils/Logger.cpp
+		utils/LoggerStream.cpp
 		utils/Format.cpp
 		)
 
@@ -93,6 +94,5 @@ target_link_libraries(LiveBroadcastServer lbs_net_lib)
 target_link_libraries(LiveBroadcastServer lbs_db_lib)
 
 option(LBS_WITH_TEST "Compile LiveBroadcastServer Test" OFF)
-if(LBS_WITH_TEST)
-	add_subdirectory(test)
-endif()
+
+add_subdirectory(test)

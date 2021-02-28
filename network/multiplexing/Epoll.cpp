@@ -21,7 +21,7 @@ void Epoll::LoopOnce(int timeout, ChannelVector* active_channels)
 	{
 		if (errno != EINTR)
 		{
-			LOG_ERROR("error signal: %d", errno);
+			LOG_ERROR << "error signal: " << errno;
 
 			exit(-1);
 		}
