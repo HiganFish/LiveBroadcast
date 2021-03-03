@@ -8,12 +8,12 @@ class EventLoop;
 class Acceptor
 {
 public:
-	typedef std::function<void(SOCKET, const InetAddress&)> NewConnectionCallback;
+	typedef std::function<void(int, const InetAddress&)> NewConnectionCallback;
 
 	Acceptor(EventLoop* loop, const std::string& server_name, const InetAddress& address);
 	~Acceptor();
 
-	SOCKET Accept(InetAddress* address);
+	int Accept(InetAddress* address);
 
 	void Listen();
 

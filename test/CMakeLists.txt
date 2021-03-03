@@ -5,7 +5,6 @@ set(TESTS_NO_DB
         Main
         TcpServer
         Thread
-        LoggerTest
 )
 
 set(TESTS_DB
@@ -13,14 +12,12 @@ set(TESTS_DB
         UserMapper
         )
 
-if(LBS_WITH_TEST)
-    foreach(test ${TESTS_NO_DB})
-        add_executable(${test} ${test}/${test}Test.cpp)
-        target_link_libraries(${test} lbs_net_lib)
-    endforeach()
+foreach(test ${TESTS_NO_DB})
+    add_executable(${test} ${test}/${test}Test.cpp)
+    target_link_libraries(${test} lbs_net_lib)
+endforeach()
 
-    foreach(test ${TESTS_DB})
-        add_executable(${test} ${test}/${test}Test.cpp)
-        target_link_libraries(${test} lbs_db_lib)
-    endforeach()
-endif()
+foreach(test ${TESTS_DB})
+    add_executable(${test} ${test}/${test}Test.cpp)
+    target_link_libraries(${test} lbs_db_lib)
+endforeach()

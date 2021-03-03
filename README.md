@@ -1,14 +1,14 @@
 # 项目说明
 
-**使用C++20标准 Windows和Centos平台均使用gcc10.1编译通过正常使用**
+**使用C++17标准 Windows和Centos平台均使用gcc8.3编译通过正常使用**
 
-**最新代码暂未适配Windows v1.0.0 版本支持Windows**
+**仅v1.0.0 版本支持Windows**
 
 **运行后在两个推流者四个观看者情况下 占用内存6Mb CPU使用极低**
 
 **支持IPV4和IPV6**
 
-服务器端代码量 包含网络部分 5000余行
+服务器端代码量 4000余行
 
 HttpFlv拉流的播放器目前测试通过PotPlayer, VLC, flv.js
 
@@ -287,8 +287,6 @@ Obs发送`Video Data`其中Data为sps_pps_tag的data部分  视频数据包
 │   │   ├── MultiplexingBase.h
 │   │   ├── Select.cpp
 │   │   └── Select.h
-│   ├── PlatformNetwork.cpp 跨平台相关
-│   ├── PlatformNetwork.h
 │   ├── protocol Rtmp和HttpFlv连接管理
 │   │   ├── RtmpClientConnection.cpp
 │   │   ├── RtmpClientConnection.h
@@ -357,8 +355,6 @@ Obs发送`Video Data`其中Data为sps_pps_tag的data部分  视频数据包
 ├── Format.h
 ├── Logger.cpp
 ├── Logger.h
-├── PlatformBase.cpp 基础跨平台相关
-├── PlatformBase.h 基础跨平台相关
 ├── Timestamp.cpp
 └── Timestamp.h
 ```

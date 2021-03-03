@@ -65,16 +65,16 @@ private:
 	/** 用于设置可写回调验证链接是否真正建立*/
 	std::unique_ptr<Channel> channel_ptr_;
 
-	void Retry(SOCKET sockfd);
+	void Retry(int sockfd);
 
 	/** 用于设置可写回调验证链接是否真正建立*/
-	void Connecting(SOCKET sockfd);
+	void Connecting(int sockfd);
 
 	/**
 	 * 主要目的重置Channel设置的可写回调事件
 	 * @return Channel对应的文件描述符
 	 */
-	SOCKET RemoveAndResetChannel();
+	int RemoveAndResetChannel();
 
 	/** 用于验证连接建立的可写回调*/
 	void HandleWrite();

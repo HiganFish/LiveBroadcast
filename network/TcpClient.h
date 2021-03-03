@@ -70,7 +70,7 @@ private:
 	bool retry_;
 	bool connect_;
 
-	void OnNewConnection(SOCKET sockfd);
+	void OnNewConnection(int sockfd);
 
 	void RemoveConnection(const TcpConnectionPtr& connection);
 };

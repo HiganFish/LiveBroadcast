@@ -63,7 +63,7 @@ void Select::UpdateChannel(Channel* channel)
 void Select::FdSet(Channel* channel)
 {
 	uint32_t event = channel->GetEpollEvent();
-	SOCKET fd = channel->GetSockFd();
+	int fd = channel->GetSockFd();
 
 	channel_map_[fd] = channel;
 
@@ -79,7 +79,7 @@ void Select::FdSet(Channel* channel)
 
 void Select::FdClear(Channel* channel)
 {
-	SOCKET fd = channel->GetSockFd();
+	int fd = channel->GetSockFd();
 
 	channel_map_.erase(fd);
 
@@ -96,7 +96,7 @@ void Select::FdClear(Channel* channel)
 void Select::FdMod(Channel* channel)
 {
 	uint32_t event = channel->GetEpollEvent();
-	SOCKET fd = channel->GetSockFd();
+	int fd = channel->GetSockFd();
 
 	if (!(event & XEPOLLIN))
 	{
@@ -108,7 +108,7 @@ void Select::FdMod(Channel* channel)
 	}
 }
 
-bool Select::FdIsSet(SOCKET sockfd, fd_set* set)
+bool Select::FdIsSet(int sockfd, fd_set* set)
 {
 	return FD_ISSET(sockfd, set);
 }

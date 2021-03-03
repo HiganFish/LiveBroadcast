@@ -47,7 +47,7 @@ private:
 
 	std::unique_ptr<EventLoopThreadPool> thread_pool_;
 
-	void OnNewConnection(SOCKET sockfd, const InetAddress& address);
+	void OnNewConnection(int sockfd, const InetAddress& address);
 
 	void OnCloseConnection(const TcpConnectionPtr& connection_ptr);
 };

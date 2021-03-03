@@ -3,7 +3,7 @@
 #include "network/SocketOps.h"
 #include "network/Socket.h"
 
-Socket::Socket(SOCKET sockfd) :
+Socket::Socket(int sockfd) :
 	sockfd_(sockfd)
 {
 
@@ -18,12 +18,12 @@ Socket::~Socket()
 	}
 }
 
-SOCKET Socket::GetSockFd() const
+int Socket::GetSockFd() const
 {
 	return sockfd_;
 }
 
-void Socket::SetSockfd(SOCKET sockfd)
+void Socket::SetSockfd(int sockfd)
 {
 	sockfd_ = sockfd;
 }
@@ -51,7 +51,7 @@ void Socket::Listen()
 	socketops::Listen(sockfd_);
 }
 
-SOCKET Socket::Accept(InetAddress* address)
+int Socket::Accept(InetAddress* address)
 {
 
 	return socketops::Accept(sockfd_, address->GetSockAddr());

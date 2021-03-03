@@ -1,7 +1,6 @@
 #ifndef NETWORK_CHANNEL
 #define NETWORK_CHANNEL
 
-#include "network/PlatformNetwork.h"
 #include "network/Callback.h"
 
 class EventLoop;
@@ -15,8 +14,8 @@ public:
 		CHANNEL_STATUS_DEL
 	};
 
-	Channel(EventLoop* loop, SOCKET sockfd);
-	Channel(EventLoop* loop, const std::string& connection_name, SOCKET sockfd);
+	Channel(EventLoop* loop, int sockfd);
+	Channel(EventLoop* loop, const std::string& connection_name, int sockfd);
 
 	void SetEvent(uint32_t ev);
 	uint32_t GetEpollEvent() const;
@@ -24,7 +23,7 @@ public:
 	ChannelStatus GetChannelStatus() const;
 	void SetChannelStatus(ChannelStatus channel_status);
 
-	SOCKET GetSockFd() const;
+	int GetSockFd() const;
 
 	void HandleEventWithGuard();
 
@@ -48,7 +47,7 @@ private:
 
 	std::string connection_name;
 
-	SOCKET fd_;
+	int fd_;
 	ChannelStatus channel_status_;
 	/* 多路复用返回的事件*/
 	uint32_t event_;

@@ -6,7 +6,6 @@
 #include <sys/epoll.h>
 
 #include "network/multiplexing/MultiplexingBase.h"
-#include "network/PlatformNetwork.h"
 
 class Epoll : public MultiplexingBase
 {
@@ -25,7 +24,7 @@ private:
 
 	void FillActiveSocketVector(int nums, ChannelVector* active_channels);
 
-	void EpollControl(int ctl, SOCKET fd, void* ptr, uint32_t ev);
+	void EpollControl(int ctl, int fd, void* ptr, uint32_t ev);
 
 	void RemoveChannel(Channel* channel);
 
