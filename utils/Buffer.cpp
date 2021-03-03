@@ -1,4 +1,5 @@
 #include <cstring>
+#include <unistd.h>
 #include "utils/Buffer.h"
 
 
@@ -107,10 +108,10 @@ size_t Buffer::AppendData(const std::string& data)
 	return AppendData(data.data(), data.length());
 }
 
-ssize_t Buffer::ReadFromSockfd(SOCKET sockfd)
+ssize_t Buffer::ReadFromSockfd(int sockfd)
 {
 	AdjustBuffer();
-	ssize_t result = recv(sockfd, WriteBegin(), WritableLength(), 0);
+	ssize_t result = read(sockfd, WriteBegin(), WritableLength());
 	if (result <= 0)
 	{
 		return result;
@@ -119,10 +120,10 @@ ssize_t Buffer::ReadFromSockfd(SOCKET sockfd)
 	return result;
 }
 
-ssize_t Buffer::ReadFromSockfdAndDrop(SOCKET sockfd)
+ssize_t Buffer::ReadFromSockfdAndDrop(int sockfd)
 {
 	AdjustBuffer();
-	ssize_t result = recv(sockfd, WriteBegin(), WritableLength(), 0);
+	ssize_t result = read(sockfd, WriteBegin(), WritableLength());
 	return result;
 }
 

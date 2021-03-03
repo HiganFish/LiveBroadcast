@@ -9,7 +9,6 @@
 #include <cstring>
 #include "utils/Timestamp.h"
 #include "utils/LoggerStream.h"
-#include "utils/PlatformBase.h"
 
 class Logger
 {
@@ -72,7 +71,7 @@ inline Logger::LogLevel Logger::GetLogLevel()
 }
 
 
-#define __FILENAME__ (strrchr(__FILE__, DELIMITER) ? strrchr(__FILE__, DELIMITER) + 1 : __FILE__)
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define LOG_DEBUG if (Logger::GetLogLevel() <= Logger::DEBUG)\
 Logger(Logger::DEBUG, __FILENAME__, __LINE__).GetStream()

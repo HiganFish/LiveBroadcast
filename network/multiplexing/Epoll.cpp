@@ -72,7 +72,7 @@ void Epoll::FillActiveSocketVector(int nums, ChannelVector* active_channels)
 	}
 }
 
-void Epoll::EpollControl(int ctl, SOCKET fd, void* ptr, uint32_t events)
+void Epoll::EpollControl(int ctl, int fd, void* ptr, uint32_t events)
 {
 	if (ctl == EPOLL_CTL_DEL)
 	{
@@ -89,7 +89,7 @@ void Epoll::EpollControl(int ctl, SOCKET fd, void* ptr, uint32_t events)
 
 void Epoll::RemoveChannel(Channel* channel)
 {
-	SOCKET fd = channel->GetSockFd();
+	int fd = channel->GetSockFd();
 
 	epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr);
 
@@ -101,7 +101,7 @@ void Epoll::UpdateChannelInternal(int ctl, Channel* channel)
 	epoll_event ev;
 	ev.data.ptr = channel;
 	ev.events = channel->GetEpollEvent();
-	SOCKET fd = channel->GetSockFd();
+	int fd = channel->GetSockFd();
 
 	if (ctl == EPOLL_CTL_ADD)
 	{

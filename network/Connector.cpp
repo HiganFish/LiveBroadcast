@@ -27,7 +27,7 @@ void Connector::Connect()
 {
 	connect_ = true;
 
-	SOCKET sockfd = socketops::CreateDefaultSocket(server_addr_.GetFamily());
+	int sockfd = socketops::CreateDefaultSocket(server_addr_.GetFamily());
 
 	int ret = socketops::Connect(sockfd, *server_addr_.GetSockAddr());
 	int save_errno = (ret == 0 ? 0 : errno);
@@ -76,7 +76,7 @@ void Connector::ReConnect()
 	Connect();
 }
 
-void Connector::Retry(SOCKET sockfd)
+void Connector::Retry(int sockfd)
 {
 	socketops::Close(sockfd);
 	status_ = DISCONNECTED;
@@ -90,7 +90,7 @@ void Connector::Retry(SOCKET sockfd)
 	}
 }
 
-void Connector::Connecting(SOCKET sockfd)
+void Connector::Connecting(int sockfd)
 {
 	status_ = CONNECTING;
 
@@ -103,10 +103,10 @@ void Connector::Connecting(SOCKET sockfd)
 }
 
 
-SOCKET Connector::RemoveAndResetChannel()
+int Connector::RemoveAndResetChannel()
 {
 	channel_ptr_->DisableAll();
-	SOCKET sockfd = channel_ptr_->GetSockFd();
+	int sockfd = channel_ptr_->GetSockFd();
 	channel_ptr_.reset();
 
 	return sockfd;
@@ -117,7 +117,7 @@ void Connector::HandleWrite()
 	if (status_ == CONNECTING)
 	{
 		/** 成功执行可写回调 连接建立 清除回调事件*/
-		SOCKET sockfd = RemoveAndResetChannel();
+		int sockfd = RemoveAndResetChannel();
 		status_ = CONNECTED;
 
 		/** 当连接到本机ip的时候. 由于connect会为连接选取一个本地端口 然后发起连接

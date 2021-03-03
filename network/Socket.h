@@ -3,18 +3,16 @@
 
 #include <string>
 #include <cassert>
-
-#include "network/PlatformNetwork.h"
 #include "network/InetAddress.h"
 
 class Socket
 {
 public:
-	Socket(SOCKET sockfd);
+	Socket(int sockfd);
 	~Socket();
 
-	SOCKET GetSockFd() const;
-	void SetSockfd(SOCKET sockfd);
+	int GetSockFd() const;
+	void SetSockfd(int sockfd);
 
 	void SetReusePort();
 
@@ -24,14 +22,14 @@ public:
 
 	void Listen();
 
-	SOCKET Accept(InetAddress* address);
+	int Accept(InetAddress* address);
 
 	ssize_t Send(const char* data, size_t length);
 
 	void ShutdownWrite();
 private:
 
-	SOCKET sockfd_;
+	int sockfd_;
 };
 
 #endif

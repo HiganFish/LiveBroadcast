@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <string>
-#include "network/PlatformNetwork.h"
+#include <arpa/inet.h>
 
 class InetAddress
 {

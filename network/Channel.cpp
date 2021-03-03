@@ -1,14 +1,15 @@
+#include <sys/epoll.h>
 #include "network/Channel.h"
 #include "network/EventLoop.h"
 #include "utils/Logger.h"
 
-Channel::Channel(EventLoop* loop, SOCKET sockfd):
+Channel::Channel(EventLoop* loop, int sockfd):
 	Channel(loop, "default-connection-name", sockfd)
 {
 
 }
 
-Channel::Channel(EventLoop* loop, const std::string& connection_name, SOCKET fd) :
+Channel::Channel(EventLoop* loop, const std::string& connection_name, int fd) :
     loop_(loop),
 	connection_name(connection_name),
 	fd_(fd),
@@ -40,7 +41,7 @@ void Channel::SetChannelStatus(ChannelStatus channel_status)
 	channel_status_ = channel_status;
 }
 
-SOCKET Channel::GetSockFd() const
+int Channel::GetSockFd() const
 {
 	return fd_;
 }
@@ -90,19 +91,19 @@ void Channel::SetWritableCallback(const EventCallback& cb)
 
 void Channel::EnableReadable()
 {
-    ep_event_ |= XEPOLLIN;
+    ep_event_ |= EPOLLIN;
     Update();
 }
 
 void Channel::EnableWritable()
 {
-	ep_event_ |= XEPOLLOUT;
+	ep_event_ |= EPOLLOUT;
 	Update();
 }
 
 void Channel::DisableWritable()
 {
-	ep_event_ &= ~XEPOLLOUT;
+	ep_event_ &= ~EPOLLOUT;
 	Update();
 }
 
@@ -126,7 +127,7 @@ void Channel::DisableAll()
 
 void Channel::HandleEvent()
 {
-	if (event_ & XEPOLLIN)
+	if (event_ & EPOLLIN)
 	{
 		if (readable_callback_)
 		{
@@ -134,7 +135,7 @@ void Channel::HandleEvent()
 		}
 	}
 
-	if (event_ & XEPOLLOUT)
+	if (event_ & EPOLLOUT)
 	{
 		if (writable_callback_)
 		{
@@ -145,5 +146,5 @@ void Channel::HandleEvent()
 
 bool Channel::IsWriting() const
 {
-	return event_ & XEPOLLOUT;
+	return event_ & EPOLLOUT;
 }

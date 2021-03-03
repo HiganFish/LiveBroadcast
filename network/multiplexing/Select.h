@@ -37,12 +37,12 @@ private:
 	fd_set readset_select_;
 	fd_set writeset_select_;
 
-	std::map<SOCKET, Channel*> channel_map_;
+	std::map<int, Channel*> channel_map_;
 
 	void FdSet(Channel* channel);
 	void FdClear(Channel* channel);
 	void FdMod(Channel* channel);
-	bool FdIsSet(SOCKET sockfd, fd_set* set);
+	bool FdIsSet(int sockfd, fd_set* set);
 
 	void FillActiveSocketVector(int num, ChannelVector* active_channels);
 };
