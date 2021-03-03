@@ -4,8 +4,6 @@
 #include <vector>
 #include <string>
 
-#include "utils/PlatformBase.h"
-
 constexpr int DEFAULT_BUFFER_SIZE = 4096;
 constexpr int IDX_BEGIN = 8;
 
@@ -58,14 +56,14 @@ public:
 	 * @param sockfd
 	 * @return -1 出错 0 结束 大于0为读取的长度
 	 */
-	ssize_t ReadFromSockfd(SOCKET sockfd);
+	ssize_t ReadFromSockfd(int sockfd);
 
 	/**
 	 * 从sockfd中读取数据并丢弃
 	 * @param sockfd
 	 * @return 丢弃的数据长度
 	 */
-	ssize_t ReadFromSockfdAndDrop(SOCKET sockfd);
+	ssize_t ReadFromSockfdAndDrop(int sockfd);
 
 	void SwapBuffer(Buffer* buffer);
 

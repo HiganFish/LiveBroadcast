@@ -41,7 +41,7 @@ void TcpServer::SetWriteCompleteCallback(const WriteCompleteCallback& cb)
 	write_complete_callback_ = cb;
 }
 
-void TcpServer::OnNewConnection(SOCKET sockfd, const InetAddress& address)
+void TcpServer::OnNewConnection(int sockfd, const InetAddress& address)
 {
 	char buffer[64];
 	snprintf(buffer, sizeof buffer, "-%s#%d", address.ToIpPort().c_str(), connection_id_++);

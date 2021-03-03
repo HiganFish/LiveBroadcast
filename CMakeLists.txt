@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 
 project("LiveBroadcastServer")
 
-set(CMAKE_CXX_FLAGS "-Wall -Werror -std=c++2a -g -o0")
+set(CMAKE_CXX_FLAGS "-Wall -Werror -std=c++17 -g -o0")
 
 include_directories(${CMAKE_SOURCE_DIR})
 
@@ -22,8 +22,7 @@ set(NETWORK_SRCS
 		network/multiplexing/Epoll.cpp
 		network/multiplexing/MultiplexingBase.cpp
 		network/multiplexing/Select.cpp
-		network/PlatformNetwork.cpp
-        network/protocol/RtmpServerConnection.cpp
+		network/protocol/RtmpServerConnection.cpp
         network/protocol/RtmpClientConnection.cpp
 		network/TcpClient.cpp
 		network/Connector.cpp
@@ -95,4 +94,6 @@ target_link_libraries(LiveBroadcastServer lbs_db_lib)
 
 option(LBS_WITH_TEST "Compile LiveBroadcastServer Test" OFF)
 
-add_subdirectory(test)
+if(LBS_WITH_TEST)
+	add_subdirectory(test)
+endif()

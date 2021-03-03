@@ -2,7 +2,7 @@
 #include "network/EventLoop.h"
 #include "utils/Logger.h"
 
-TcpConnection::TcpConnection(EventLoop* loop, const std::string& connection_name, SOCKET sockfd,
+TcpConnection::TcpConnection(EventLoop* loop, const std::string& connection_name, int sockfd,
 		const InetAddress& address) :
 		connection_status_(CONNECTING),
 		loop_(loop),
@@ -69,7 +69,7 @@ void TcpConnection::OnReadable()
 	}
 	else
 	{
-		LOG_INFO << "TcpConnection::OnReadable, error: " << GetLastErrorAsString();
+		LOG_INFO << "TcpConnection::OnReadable ";
 	}
 }
 
@@ -135,7 +135,7 @@ const std::string& TcpConnection::GetConnectionName() const
 	return connection_name_;
 }
 
-SOCKET TcpConnection::GetSockfd() const
+int TcpConnection::GetSockfd() const
 {
 	return sockfd_.GetSockFd();
 }

@@ -25,7 +25,7 @@ public:
 	 * @param sockfd 连接的文件描述符
 	 * @param address 链接地址
 	 */
-	TcpConnection(EventLoop* loop, const std::string& connection_name, SOCKET sockfd, const InetAddress& address);
+	TcpConnection(EventLoop* loop, const std::string& connection_name, int sockfd, const InetAddress& address);
 	~TcpConnection();
 	/**
 	 * 建立连接
@@ -55,7 +55,7 @@ public:
 
 	void Shutdown();
 
-	SOCKET GetSockfd() const;
+	int GetSockfd() const;
 
 	bool Connected() const;
 

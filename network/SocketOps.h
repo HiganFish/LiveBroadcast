@@ -1,35 +1,37 @@
 #ifndef NETWORK_SOCKETOPS
 #define NETWORK_SOCKETOPS
 
-#include "network/PlatformNetwork.h"
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <string>
 
 namespace socketops
 {
-	SOCKET CreateDefaultSocket(int family);
+	int CreateDefaultSocket(int family);
 
-	SOCKET CreateNonblockSocket(int family);
+	int CreateNonblockSocket(int family);
 
 	int Htons(int port);
 
-	void Bind(SOCKET sockfd, const sockaddr& address);
+	void Bind(int sockfd, const sockaddr& address);
 
-	int Connect(SOCKET sockfd, const sockaddr& address);
+	int Connect(int sockfd, const sockaddr& address);
 
-	void Listen(SOCKET sockfd);
+	void Listen(int sockfd);
 
-	void SetReusePort(SOCKET sockfd);
+	void SetReusePort(int sockfd);
 
-	void SetReuseAddr(SOCKET sockfd);
+	void SetReuseAddr(int sockfd);
 
-	SOCKET Accept(SOCKET sockfd, struct sockaddr* address);
+	int Accept(int sockfd, struct sockaddr* address);
 
-	ssize_t Send(SOCKET sockfd, const char* data, size_t length);
+	ssize_t Send(int sockfd, const char* data, size_t length);
 
-	void Close(SOCKET sockfd);
+	void Close(int sockfd);
 
-	void ShutdownWrite(SOCKET sockfd);
+	void ShutdownWrite(int sockfd);
 
-	sockaddr_in6 GetPeerAddr(SOCKET sockfd);
+	sockaddr_in6 GetPeerAddr(int sockfd);
 
 	int InetPton(int af, const char* from, void* to);
 

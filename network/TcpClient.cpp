@@ -62,7 +62,7 @@ void TcpClient::SetReConnect(bool open)
 	retry_ = true;
 }
 
-void TcpClient::OnNewConnection(SOCKET sockfd)
+void TcpClient::OnNewConnection(int sockfd)
 {
 	InetAddress address(socketops::GetPeerAddr(sockfd));
 

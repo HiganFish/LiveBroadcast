@@ -11,10 +11,6 @@
 #include "utils/Format.h"
 #include "mapper/UserMapper.h"
 
-#ifdef _WIN32
-NetworkInitializer init;
-#endif
-
 std::map<std::string, RtmpServerConnection*> rtmp_connection_map;
 // UserMapper user_mapper_;
 
