@@ -22,7 +22,7 @@ HTTP包装 RTMP解析 FLV解析 参考自网络相关文档
 
 # 项目规划
 
-开发轻量级跨Windows和Linux的支持Rtmp推流HttpFlv拉流的服务端
+开发轻量级Linux端的支持Rtmp推流HttpFlv拉流的服务端
 
 项目不打算开发UI方面的功能, 视频将使用第三方的支持HttpFlv拉流的播放器来播放(如PotPlayer, flv.js)
 
@@ -38,7 +38,7 @@ HTTP包装 RTMP解析 FLV解析 参考自网络相关文档
 
 多线程支持(开发完成)
 
-完善的日志库(待开发)
+完善的日志库(开发完成)
 
 # 使用说明
 
