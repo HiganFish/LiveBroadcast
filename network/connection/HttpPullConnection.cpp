@@ -2,7 +2,7 @@
 // Created by rjd67 on 2020/11/30.
 //
 
-#include "network/protocol/HttpPullConnection.h"
+#include "network/connection/HttpPullConnection.h"
 #include "utils/Format.h"
 
 HttpPullConnection::HttpPullConnection(const TcpConnectionPtr& connection_ptr):
@@ -27,9 +27,14 @@ void HttpPullConnection::SendHeader(const Buffer* buffer)
 	connection_ptr_->Send(buffer);
 }
 
-void HttpPullConnection::AddNewTag(const FlvTagBufferPtr& tag_buffer_ptr)
+void HttpPullConnection::AddNewTag(const FlvTagPtr& flv_tag_ptr)
 {
-	connection_ptr_->Send(tag_buffer_ptr->GetBuffer());
+	std::string length_rn = Format::ToHexStringWithCrlf(flv_tag_ptr->GetSumSize());
+
+	connection_ptr_->Send(length_rn);
+	connection_ptr_->Send(flv_tag_ptr->GetHeader(), FlvTag::FLV_TAG_HEADER_LENGTH);
+	connection_ptr_->Send(flv_tag_ptr->GetBody());
+	connection_ptr_->Send("\r\n");
 }
 
 void HttpPullConnection::SetCloseConnectionCallback(const ConnectionCallback& callback)
@@ -47,22 +52,4 @@ void HttpPullConnection::OnConnection(const TcpConnectionPtr& connection_ptr)
 			close_connection_callback_(connection_ptr);
 		}
 	}
-}
-
-FlvTagBuffer::FlvTagBuffer(const FlvTagPtr& flv_tag) :
-		buffer_size_(FlvTag::FLV_TAG_HEADER_LENGTH + flv_tag->GetBody()->ReadableLength()),
-		buffer_(buffer_size_)
-{
-	std::string length_rn = Format::ToHexStringWithCrlf(buffer_size_);
-	buffer_.AppendData(length_rn);
-	buffer_.AppendData(flv_tag->GetHeader(), FlvTag::FLV_TAG_HEADER_LENGTH);
-	buffer_.AppendData(flv_tag->GetBody());
-	buffer_.AppendData("\r\n");
-
-	assert(buffer_.ReadableLength() - length_rn.size() - 2 == buffer_size_);
-}
-
-const Buffer* FlvTagBuffer::GetBuffer() const
-{
-	return &buffer_;
 }

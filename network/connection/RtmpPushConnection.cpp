@@ -2,7 +2,7 @@
 // Created by rjd67 on 2020/11/29.
 //
 
-#include "network/protocol/RtmpPushConnection.h"
+#include "network/connection/RtmpPushConnection.h"
 #include "utils/Logger.h"
 #include "utils/Format.h"
 
@@ -230,17 +230,16 @@ void RtmpPushConnection::SendHeaderToClientConnection(
 	 * 头部之后第一个 Tag的PreviousTagSize 需要设置为 头部中最后一个Tag的CurrentSize
 	 */
 	last_flv_tag_ptr_->SetPreviousTagSize(GetLastHeaderTagCurrentSize());
-	client_connection_ptr->AddNewTag(std::make_shared<FlvTagBuffer>(last_flv_tag_ptr_));
+	client_connection_ptr->AddNewTag(last_flv_tag_ptr_);
 }
 
 void RtmpPushConnection::OnNewFlvTag(const FlvTagPtr& tag_ptr)
 {
 	last_flv_tag_ptr_ = tag_ptr;
-	FlvTagBufferPtr buffer_ptr = std::make_shared<FlvTagBuffer>(tag_ptr);
 
 	for (auto& [connection_name, connection_ptr] : client_connection_map_)
 	{
-		connection_ptr->AddNewTag(buffer_ptr);
+		connection_ptr->AddNewTag(tag_ptr);
 	}
 }
 

@@ -22,12 +22,16 @@ set(NETWORK_SRCS
 		network/multiplexing/Epoll.cpp
 		network/multiplexing/MultiplexingBase.cpp
 		network/multiplexing/Select.cpp
-		network/protocol/RtmpPushConnection.cpp
-		network/protocol/HttpPullConnection.cpp
 		network/TcpClient.cpp
 		network/Connector.cpp
 		network/EventLoopThread.cpp
 		network/EventLoopThreadPool.cpp
+		)
+
+set(CONN_SRCS
+		network/connection/RtmpPushConnection.cpp
+		network/connection/PullConnection.cpp
+		network/connection/HttpPullConnection.cpp
 		)
 
 set(UTILS_SRCS
@@ -80,17 +84,17 @@ target_link_libraries(lbs_base_lib pthread)
 
 add_library(lbs_net_lib ${NETWORK_SRCS})
 target_link_libraries(lbs_net_lib lbs_base_lib)
-if(WIN32)
-	target_link_libraries(lbs_net_lib ws2_32)
-endif()
 
 add_library(lbs_db_lib ${DB_SRCS})
 target_link_libraries(lbs_db_lib mysqlclient)
 target_link_libraries(lbs_db_lib lbs_base_lib)
 
+add_library(lib_conn_lib ${CONN_SRCS})
+
 add_executable(LiveBroadcastServer main.cpp)
-target_link_libraries(LiveBroadcastServer lbs_net_lib)
+target_link_libraries(LiveBroadcastServer lbs_net_lib lib_conn_lib)
 # target_link_libraries(LiveBroadcastServer lbs_db_lib)
+
 
 option(LBS_WITH_TEST "Compile LiveBroadcastServer Test" OFF)
 

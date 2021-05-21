@@ -287,7 +287,7 @@ Obs发送`Video Data`其中Data为sps_pps_tag的data部分  视频数据包
 │   │   ├── MultiplexingBase.h
 │   │   ├── Select.cpp
 │   │   └── Select.h
-│   ├── protocol Rtmp和HttpFlv连接管理
+│   ├── connection Rtmp和HttpFlv连接管理
 │   │   ├── RtmpClientConnection.cpp
 │   │   ├── RtmpClientConnection.h
 │   │   ├── RtmpServerConnection.cpp

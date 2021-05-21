@@ -9,7 +9,7 @@
 
 #include "network/TcpConnection.h"
 #include "utils/codec/RtmpManager.h"
-#include "network/protocol/HttpPullConnection.h"
+#include "network/connection/HttpPullConnection.h"
 
 /**
  * 管理Tcp连接 和 RtmpManager

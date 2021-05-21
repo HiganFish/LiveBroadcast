@@ -151,6 +151,11 @@ Buffer* FlvTag::GetBody()
 	return &body_;
 }
 
+size_t FlvTag::GetSumSize() const
+{
+	return FlvTag::FLV_TAG_HEADER_LENGTH + body_.ReadableLength();
+}
+
 ssize_t FlvHeader::EncodeToBuffer(char* data, size_t length)
 {
 	if (length < FLV_HEADER_LENGTH)
