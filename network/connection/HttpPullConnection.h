@@ -21,7 +21,7 @@ public:
 	 * 在连接刚建立时 需要发送一次包含元数据的头部
 	 * @param buffer
 	 */
-	void SendHeader(const Buffer* buffer);
+	void SendHeader(const Buffer& buffer);
 
 	/**
 	 * 向客户端添加新的 flv_tag_ptr 并进行发送

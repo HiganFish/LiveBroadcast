@@ -93,28 +93,14 @@ void RtmpPushConnection::DebugParseSize(size_t division)
 				 << " bytes";
 	}
 }
-std::string response_header = "HTTP/1.1 200 OK\r\n"
-							  "Server: FISH_LIVE\r\n"
-							  "Date: Sun, 29 Nov 2020 15:30:42 GMT\r\n"
-							  "Content-Type: video/x-flv\r\n"
-							  "Transfer-Encoding: chunked\r\n"
-							  "Connection: keep-alive\r\n"
-							  "Access-Control-Allow-Origin: *\r\n\r\n";
 
-const Buffer* RtmpPushConnection::GetHeaderDataBuffer()
+const Buffer& RtmpPushConnection::GetHeaderDataBuffer()
 {
 	if (header_buffer_.ReadableLength() == 0)
 	{
-		Buffer header_buffer_temp;
-		flv_manager_->EncodeHeadersToBuffer(&header_buffer_temp);
-
-		std::string length_rn = Format::ToHexStringWithCrlf(header_buffer_temp.ReadableLength());
-		header_buffer_.AppendData(response_header);
-		header_buffer_.AppendData(length_rn);
-		header_buffer_.AppendData(&header_buffer_temp);
-		header_buffer_.AppendData("\r\n");
+		flv_manager_->EncodeHeadersToBuffer(&header_buffer_);
 	}
-	return &header_buffer_;
+	return header_buffer_;
 }
 
 void RtmpPushConnection::OnConnectionShakeHand(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Timestamp timestamp)
@@ -222,7 +208,7 @@ void RtmpPushConnection::SetAuthenticationCallback(const AuthenticationCallback&
 void RtmpPushConnection::SendHeaderToClientConnection(
 		const RtmpClientConnectionPtr& client_connection_ptr)
 {
-	const Buffer* header_buffer = GetHeaderDataBuffer();
+	const Buffer& header_buffer = GetHeaderDataBuffer();
 
 	client_connection_ptr->SendHeader(header_buffer);
 

@@ -168,9 +168,9 @@ void TcpConnection::Send(const uint8_t* data, size_t length)
 	return Send(reinterpret_cast<const char*>(data), length);
 }
 
-void TcpConnection::Send(const Buffer* buffer)
+void TcpConnection::Send(const Buffer& buffer)
 {
-	return Send(buffer->ReadBegin(), buffer->ReadableLength());
+	return Send(buffer.ReadBegin(), buffer.ReadableLength());
 }
 
 void TcpConnection::Send(const std::string& data)

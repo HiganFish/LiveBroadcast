@@ -22,19 +22,38 @@ std::string HttpPullConnection::GetConnectionName() const
 	return connection_ptr_->GetConnectionName();
 }
 
-void HttpPullConnection::SendHeader(const Buffer* buffer)
+constexpr char response_header[] = "HTTP/1.1 200 OK\r\n"
+                              "Server: FISH_LIVE\r\n"
+                              "Date: Sun, 29 Nov 2020 15:30:42 GMT\r\n"
+                              "Content-Type: video/x-flv\r\n"
+                              "Transfer-Encoding: chunked\r\n"
+                              "Connection: keep-alive\r\n"
+                              "Access-Control-Allow-Origin: *\r\n\r\n";
+
+void HttpPullConnection::SendHeader(const Buffer& buffer)
 {
-	connection_ptr_->Send(buffer);
+	std::string length_rn = Format::ToHexStringWithCrlf(buffer.ReadableLength());
+	Buffer temp_buffer;
+
+	temp_buffer.AppendData(response_header);
+
+	temp_buffer.AppendData(length_rn);
+	temp_buffer.AppendData(buffer);
+	temp_buffer.AppendData("\r\n");
+
+	connection_ptr_->Send(temp_buffer);
 }
 
 void HttpPullConnection::AddNewTag(const FlvTagPtr& flv_tag_ptr)
 {
 	std::string length_rn = Format::ToHexStringWithCrlf(flv_tag_ptr->GetSumSize());
+	Buffer temp_buffer;
+	temp_buffer.AppendData(length_rn);
+	temp_buffer.AppendData(flv_tag_ptr->GetHeader(), FlvTag::FLV_TAG_HEADER_LENGTH);
+	temp_buffer.AppendData(flv_tag_ptr->GetBody());
+	temp_buffer.AppendData("\r\n");
 
-	connection_ptr_->Send(length_rn);
-	connection_ptr_->Send(flv_tag_ptr->GetHeader(), FlvTag::FLV_TAG_HEADER_LENGTH);
-	connection_ptr_->Send(flv_tag_ptr->GetBody());
-	connection_ptr_->Send("\r\n");
+	connection_ptr_->Send(temp_buffer);
 }
 
 void HttpPullConnection::SetCloseConnectionCallback(const ConnectionCallback& callback)

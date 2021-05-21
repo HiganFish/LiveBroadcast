@@ -48,6 +48,8 @@ public:
 
 	size_t AppendData(const std::string& data);
 
+	size_t AppendData(const Buffer& buffer);
+
 	size_t AppendData(const Buffer* buffer);
 
 	std::string ReadAllAsString();

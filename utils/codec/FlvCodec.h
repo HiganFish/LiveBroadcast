@@ -123,7 +123,9 @@ public:
 	*/
 	ssize_t DecodeTagHander(const char* data, size_t length);
 
-	const Buffer* GetBody() const;
+	const Buffer& GetBody() const;
+	Buffer* GetBody();
+
 	const char* GetHeader() const;
 
 	void SetTagType(uint8_t tag_type);
@@ -137,8 +139,6 @@ public:
 	void SetPreviousTagSize(uint32_t previous_tag_size);
 
 	uint8_t GetTagType() const;
-
-	Buffer* GetBody();
 
 	/**
 	 * 获取本数据包的包头 + 包体的大小

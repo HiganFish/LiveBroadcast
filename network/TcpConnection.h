@@ -61,7 +61,7 @@ public:
 
 	void Send(const char* data, size_t length);
 
-	void Send(const Buffer* buffer);
+	void Send(const Buffer& buffer);
 
 	void Send(const std::string& data);
 

@@ -119,7 +119,12 @@ void FlvTag::SetSteamId(uint8_t* stream_id)
 }
 
 
-const Buffer* FlvTag::GetBody() const
+const Buffer& FlvTag::GetBody() const
+{
+	return body_;
+}
+
+Buffer* FlvTag::GetBody()
 {
 	return &body_;
 }
@@ -144,11 +149,6 @@ void FlvTag::SetPreviousTagSize(uint32_t previous_tag_size)
 uint8_t FlvTag::GetTagType() const
 {
 	return header_[TAG_TYPE_SUB];
-}
-
-Buffer* FlvTag::GetBody()
-{
-	return &body_;
 }
 
 size_t FlvTag::GetSumSize() const

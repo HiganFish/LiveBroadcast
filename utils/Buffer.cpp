@@ -160,11 +160,16 @@ void Buffer::Swap(size_t& lhs, size_t& rhs)
 	lhs = temp;
 }
 
+size_t Buffer::AppendData(const Buffer& buffer)
+{
+	size_t readable_data = buffer.ReadableLength();
+	AppendData(buffer.ReadBegin(), readable_data);
+	return readable_data;
+}
+
 size_t Buffer::AppendData(const Buffer* buffer)
 {
-	size_t readable_data = buffer->ReadableLength();
-	AppendData(buffer->ReadBegin(), readable_data);
-	return readable_data;
+	return AppendData(*buffer);
 }
 
 void Buffer::DropAllData()

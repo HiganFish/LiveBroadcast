@@ -48,8 +48,10 @@ void RtmpCodec::EncodeHeaderAndSwapBuffer(RtmpPack* rtmp_pack_, FlvTag* flv_tag)
 
 void RtmpCodec::SwapBuffer(RtmpPack* rtmp_pack_, FlvTag* flv_tag)
 {
-	rtmp_pack_->GetBuffer()->
-		SwapBuffer(flv_tag->GetBody());
+	Buffer* rtmp_buffer = rtmp_pack_->GetBuffer();
+	Buffer* tag_buffer = flv_tag->GetBody();
+
+	rtmp_buffer->SwapBuffer(tag_buffer);
 }
 
 ssize_t RtmpPack::DecodeHeader(const char* data, size_t length)

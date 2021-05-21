@@ -40,7 +40,7 @@ public:
 	 * 获取Flv直播流的源数据包
 	 * @return
 	 */
-	const Buffer* GetHeaderDataBuffer();
+	const Buffer& GetHeaderDataBuffer();
 
 	/**
 	 * 用于握手的回调函数  握手成功后自动切换为OnBodyData 处理真正的数据
