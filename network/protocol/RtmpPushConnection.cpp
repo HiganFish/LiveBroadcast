@@ -2,11 +2,11 @@
 // Created by rjd67 on 2020/11/29.
 //
 
-#include "network/protocol/RtmpServerConnection.h"
+#include "network/protocol/RtmpPushConnection.h"
 #include "utils/Logger.h"
 #include "utils/Format.h"
 
-RtmpServerConnection::RtmpServerConnection(const TcpConnectionPtr& connection_ptr) :
+RtmpPushConnection::RtmpPushConnection(const TcpConnectionPtr& connection_ptr) :
 		connection_ptr_(connection_ptr),
 		rtmp_manager_(),
 		flv_manager_(rtmp_manager_.GetFlvManager()),
@@ -14,11 +14,11 @@ RtmpServerConnection::RtmpServerConnection(const TcpConnectionPtr& connection_pt
 		header_buffer_()
 {
 	rtmp_manager_.SetNewFlvTagCallback(
-			[this](auto&& PH1){RtmpServerConnection::OnNewFlvTag(PH1);}
+			[this](auto&& PH1){RtmpPushConnection::OnNewFlvTag(PH1);}
 			);
 }
 
-RtmpServerConnection::ShakeHandResult RtmpServerConnection::ShakeHand(Buffer* buffer)
+RtmpPushConnection::ShakeHandResult RtmpPushConnection::ShakeHand(Buffer* buffer)
 {
 	while (true)
 	{
@@ -56,7 +56,7 @@ RtmpServerConnection::ShakeHandResult RtmpServerConnection::ShakeHand(Buffer* bu
 				break;
 			case RtmpManager::SHAKE_SUCCESS:
 			{
-				return RtmpServerConnection::SHAKE_SUCCESS;
+				return RtmpPushConnection::SHAKE_SUCCESS;
 			}
 			case RtmpManager::SHAKE_FAILED:
 			{
@@ -74,7 +74,7 @@ RtmpServerConnection::ShakeHandResult RtmpServerConnection::ShakeHand(Buffer* bu
 	}
 }
 
-ssize_t RtmpServerConnection::ParseData(Buffer* buffer)
+ssize_t RtmpPushConnection::ParseData(Buffer* buffer)
 {
 	ssize_t result = rtmp_manager_.ParseData(buffer);
 	DebugParseSize(100 * 1000 * 1000);
@@ -82,7 +82,7 @@ ssize_t RtmpServerConnection::ParseData(Buffer* buffer)
 	return result;
 }
 
-void RtmpServerConnection::DebugParseSize(size_t division)
+void RtmpPushConnection::DebugParseSize(size_t division)
 {
 	size_t read_m = rtmp_manager_.GetParsedLength() / division;
 	if (read_m != last_write_size_)
@@ -101,7 +101,7 @@ std::string response_header = "HTTP/1.1 200 OK\r\n"
 							  "Connection: keep-alive\r\n"
 							  "Access-Control-Allow-Origin: *\r\n\r\n";
 
-const Buffer* RtmpServerConnection::GetHeaderDataBuffer()
+const Buffer* RtmpPushConnection::GetHeaderDataBuffer()
 {
 	if (header_buffer_.ReadableLength() == 0)
 	{
@@ -117,12 +117,12 @@ const Buffer* RtmpServerConnection::GetHeaderDataBuffer()
 	return &header_buffer_;
 }
 
-void RtmpServerConnection::OnConnectionShakeHand(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Timestamp timestamp)
+void RtmpPushConnection::OnConnectionShakeHand(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Timestamp timestamp)
 {
-	RtmpServerConnection::ShakeHandResult result = ShakeHand(buffer);
+	RtmpPushConnection::ShakeHandResult result = ShakeHand(buffer);
 	switch (result)
 	{
-		case RtmpServerConnection::SHAKE_AUTHENTICATE:
+		case RtmpPushConnection::SHAKE_AUTHENTICATE:
 		{
 			if (!Authenticate())
 			{
@@ -135,7 +135,7 @@ void RtmpServerConnection::OnConnectionShakeHand(const TcpConnectionPtr& connect
 			}
 			return;
 		}
-		case RtmpServerConnection::SHAKE_SUCCESS:
+		case RtmpPushConnection::SHAKE_SUCCESS:
 		{
 			LOG_INFO << "connection: " << connection_ptr->GetConnectionName()
 					 << " shake hand success";
@@ -156,7 +156,7 @@ void RtmpServerConnection::OnConnectionShakeHand(const TcpConnectionPtr& connect
 			 */
 			return;
 		}
-		case RtmpServerConnection::SHAKE_FAILED:
+		case RtmpPushConnection::SHAKE_FAILED:
 		{
 			LOG_WARN << "connection: %s " << connection_ptr->GetConnectionName()
 					 << "shake hand failed";
@@ -166,7 +166,7 @@ void RtmpServerConnection::OnConnectionShakeHand(const TcpConnectionPtr& connect
 			 */
 			return;
 		}
-		case RtmpServerConnection::SHAKE_DATA_NOT_ENOUGH:
+		case RtmpPushConnection::SHAKE_DATA_NOT_ENOUGH:
 			/**
 			 * 数据不足时返回
 			 */
@@ -174,12 +174,12 @@ void RtmpServerConnection::OnConnectionShakeHand(const TcpConnectionPtr& connect
 	}
 }
 
-void RtmpServerConnection::OnBodyData(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Timestamp timestamp)
+void RtmpPushConnection::OnBodyData(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Timestamp timestamp)
 {
 	ParseData(buffer);
 }
 
-void RtmpServerConnection::AddClientConnection(
+void RtmpPushConnection::AddClientConnection(
 		const RtmpClientConnectionPtr& client_connection_ptr)
 {
 	client_connection_map_[client_connection_ptr->GetConnectionName()]
@@ -194,32 +194,32 @@ void RtmpServerConnection::AddClientConnection(
 	SendHeaderToClientConnection(client_connection_ptr);
 }
 
-void RtmpServerConnection::SetShakeHandSuccessCallback(const ShakeHandSuccessCallback& callback)
+void RtmpPushConnection::SetShakeHandSuccessCallback(const ShakeHandSuccessCallback& callback)
 {
 	shake_hand_success_callback_ = callback;
 }
 
-std::string RtmpServerConnection::GetRtmpUrl() const
+std::string RtmpPushConnection::GetRtmpUrl() const
 {
 	return rtmp_manager_.GetUrlFromConnectPack();
 }
 
-std::string RtmpServerConnection::GetRtmpPath() const
+std::string RtmpPushConnection::GetRtmpPath() const
 {
 	return Format::GetPathFromUrl(GetRtmpUrl());
 }
 
-std::string RtmpServerConnection::GetConnectionName() const
+std::string RtmpPushConnection::GetConnectionName() const
 {
 	return connection_ptr_->GetConnectionName();
 }
 
-void RtmpServerConnection::SetAuthenticationCallback(const AuthenticationCallback& callback)
+void RtmpPushConnection::SetAuthenticationCallback(const AuthenticationCallback& callback)
 {
 	authentication_callback_ = callback;
 }
 
-void RtmpServerConnection::SendHeaderToClientConnection(
+void RtmpPushConnection::SendHeaderToClientConnection(
 		const RtmpClientConnectionPtr& client_connection_ptr)
 {
 	const Buffer* header_buffer = GetHeaderDataBuffer();
@@ -233,7 +233,7 @@ void RtmpServerConnection::SendHeaderToClientConnection(
 	client_connection_ptr->AddNewTag(std::make_shared<FlvTagBuffer>(last_flv_tag_ptr_));
 }
 
-void RtmpServerConnection::OnNewFlvTag(const FlvTagPtr& tag_ptr)
+void RtmpPushConnection::OnNewFlvTag(const FlvTagPtr& tag_ptr)
 {
 	last_flv_tag_ptr_ = tag_ptr;
 	FlvTagBufferPtr buffer_ptr = std::make_shared<FlvTagBuffer>(tag_ptr);
@@ -244,19 +244,19 @@ void RtmpServerConnection::OnNewFlvTag(const FlvTagPtr& tag_ptr)
 	}
 }
 
-uint32_t RtmpServerConnection::GetLastHeaderTagCurrentSize() const
+uint32_t RtmpPushConnection::GetLastHeaderTagCurrentSize() const
 {
 	return flv_manager_->GetVideoAudioTags()[1].GetCurrentTagSize();
 }
 
-void RtmpServerConnection::OnConnectionClose(const TcpConnectionPtr& connection_ptr)
+void RtmpPushConnection::OnConnectionClose(const TcpConnectionPtr& connection_ptr)
 {
 	client_connection_map_.erase(connection_ptr->GetConnectionName());
 	LOG_INFO << "client: " << connection_ptr->GetConnectionName()
 			 << ", remove from server: " << connection_ptr_->GetConnectionName();
 }
 
-bool RtmpServerConnection::Authenticate()
+bool RtmpPushConnection::Authenticate()
 {
 	std::string username = GetRtmpPath();
 	std::string password = rtmp_manager_.GetPasswordFromReleasePack();

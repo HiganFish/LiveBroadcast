@@ -6,12 +6,12 @@
 #include "network/TcpServer.h"
 #include "network/EventLoop.h"
 #include "utils/codec/RtmpManager.h"
-#include "network/protocol/RtmpServerConnection.h"
+#include "network/protocol/RtmpPushConnection.h"
 #include "utils/Logger.h"
 #include "utils/Format.h"
 #include "mapper/UserMapper.h"
 
-std::map<std::string, RtmpServerConnection*> rtmp_connection_map;
+std::map<std::string, RtmpPushConnection*> rtmp_connection_map;
 // UserMapper user_mapper_;
 
 bool OnAuthenticate(const std::string& user, const std::string& passwd)
@@ -29,7 +29,7 @@ bool OnAuthenticate(const std::string& user, const std::string& passwd)
 
 }
 
-void OnShakeHandSuccess(RtmpServerConnection* server_connection)
+void OnShakeHandSuccess(RtmpPushConnection* server_connection)
 {
 	/**
 	 * 将推流的url和server_connection关联起来 用于拉流的时候根据url获取对应的server_connection
@@ -47,7 +47,7 @@ void OnConnection(const TcpConnectionPtr& connection_ptr)
 {
 	if (connection_ptr->Connected())
 	{
-		RtmpServerConnection* server_connection = new RtmpServerConnection(connection_ptr);
+		RtmpPushConnection* server_connection = new RtmpPushConnection(connection_ptr);
 
 		// 连接建立后RtmpServerConnection内部会进行握手 然后握手成功后调用函数
 		server_connection->SetShakeHandSuccessCallback(OnShakeHandSuccess);
@@ -71,12 +71,13 @@ void OnClientMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Tim
 {
 	std::string connection_data = buffer->ReadAllAsString();
 
+
 	/**
 	 * 获取HTTP请求中的url 根据上面设置的映射关系 同样获取url
 	 * 来获取到对应的server_connection 加入其中
 	 */
 	std::string url = Format::GetUrl(connection_data);
-	RtmpServerConnection* server_connection = rtmp_connection_map[url];
+	RtmpPushConnection* server_connection = rtmp_connection_map[url];
 
 	if (server_connection)
 	{
@@ -84,7 +85,7 @@ void OnClientMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Tim
 				 << ", request url: " << url << " success";
 
 		server_connection->AddClientConnection(
-				std::make_shared<RtmpClientConnection>(connection_ptr));
+				std::make_shared<HttpPullConnection>(connection_ptr));
 	}
 	else
 	{
@@ -128,7 +129,7 @@ int main(int argc, char* argv[])
 	client_server.SetNewMessageCallback(OnClientMessage);
 
 	main_server.SetThreadNum(2);
-	client_server.SetThreadNum(2);
+	client_server.SetThreadNum(4);
 
 	main_server.Start();
 	client_server.Start();

@@ -22,8 +22,8 @@ set(NETWORK_SRCS
 		network/multiplexing/Epoll.cpp
 		network/multiplexing/MultiplexingBase.cpp
 		network/multiplexing/Select.cpp
-		network/protocol/RtmpServerConnection.cpp
-        network/protocol/RtmpClientConnection.cpp
+		network/protocol/RtmpPushConnection.cpp
+		network/protocol/HttpPullConnection.cpp
 		network/TcpClient.cpp
 		network/Connector.cpp
 		network/EventLoopThread.cpp
@@ -90,7 +90,7 @@ target_link_libraries(lbs_db_lib lbs_base_lib)
 
 add_executable(LiveBroadcastServer main.cpp)
 target_link_libraries(LiveBroadcastServer lbs_net_lib)
-target_link_libraries(LiveBroadcastServer lbs_db_lib)
+# target_link_libraries(LiveBroadcastServer lbs_db_lib)
 
 option(LBS_WITH_TEST "Compile LiveBroadcastServer Test" OFF)
 

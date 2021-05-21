@@ -63,11 +63,10 @@ int socketops::Accept(int sockfd, struct sockaddr* address)
 	socklen_t len = INET6_ADDRSTRLEN;
 	int fd = accept(sockfd, address, &len);
 
-#ifdef _WIN32
-	assert(fd != INVALID_SOCKET);
-#else
-	assert(fd >= 0);
-#endif
+	if (fd < 0)
+	{
+		LOG_FATAL << "accept error " << errno << " " << strerror(errno);
+	}
 
 	return fd;
 }

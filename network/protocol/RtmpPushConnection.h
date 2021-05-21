@@ -2,26 +2,26 @@
 // Created by rjd67 on 2020/11/29.
 //
 
-#ifndef LIVEBROADCASTSERVER_RTMPSERVERCONNECTION_H
-#define LIVEBROADCASTSERVER_RTMPSERVERCONNECTION_H
+#ifndef LIVEBROADCASTSERVER_RTMPPUSHCONNECTION_H
+#define LIVEBROADCASTSERVER_RTMPPUSHCONNECTION_H
 
 #include <map>
 
 #include "network/TcpConnection.h"
 #include "utils/codec/RtmpManager.h"
-#include "network/protocol/RtmpClientConnection.h"
+#include "network/protocol/HttpPullConnection.h"
 
 /**
  * 管理Tcp连接 和 RtmpManager
  * 管理FlvManager的Tag缓冲区 实时替换
  */
-class RtmpServerConnection;
-typedef std::shared_ptr<RtmpClientConnection> RtmpClientConnectionPtr;
+class RtmpPushConnection;
+typedef std::shared_ptr<HttpPullConnection> RtmpClientConnectionPtr;
 typedef std::map<std::string, RtmpClientConnectionPtr> RtmpClientConnectionMap;
-typedef std::function<void(RtmpServerConnection*)> ShakeHandSuccessCallback;
+typedef std::function<void(RtmpPushConnection*)> ShakeHandSuccessCallback;
 typedef std::function<bool(const std::string&, const std::string&)> AuthenticationCallback;
 
-class RtmpServerConnection
+class RtmpPushConnection
 {
 public:
 	enum ShakeHandResult
@@ -32,7 +32,7 @@ public:
 		SHAKE_DATA_NOT_ENOUGH
 	};
 
-	explicit RtmpServerConnection(const TcpConnectionPtr& connection_ptr);
+	explicit RtmpPushConnection(const TcpConnectionPtr& connection_ptr);
 
 	ssize_t ParseData(Buffer* buffer);
 
@@ -129,4 +129,4 @@ private:
 };
 
 
-#endif //LIVEBROADCASTSERVER_RTMPSERVERCONNECTION_H
+#endif //LIVEBROADCASTSERVER_RTMPPUSHCONNECTION_H

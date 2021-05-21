@@ -2,42 +2,42 @@
 // Created by rjd67 on 2020/11/30.
 //
 
-#include "network/protocol/RtmpClientConnection.h"
+#include "network/protocol/HttpPullConnection.h"
 #include "utils/Format.h"
 
-RtmpClientConnection::RtmpClientConnection(const TcpConnectionPtr& connection_ptr):
+HttpPullConnection::HttpPullConnection(const TcpConnectionPtr& connection_ptr):
 	connection_ptr_(connection_ptr)
 {
 	connection_ptr_->SetConnectionCallback(
 			[this](auto&& PH1){OnConnection(PH1);});
 }
 
-RtmpClientConnection::~RtmpClientConnection()
+HttpPullConnection::~HttpPullConnection()
 {
 
 }
 
-std::string RtmpClientConnection::GetConnectionName() const
+std::string HttpPullConnection::GetConnectionName() const
 {
 	return connection_ptr_->GetConnectionName();
 }
 
-void RtmpClientConnection::SendHeader(const Buffer* buffer)
+void HttpPullConnection::SendHeader(const Buffer* buffer)
 {
 	connection_ptr_->Send(buffer);
 }
 
-void RtmpClientConnection::AddNewTag(const FlvTagBufferPtr& tag_buffer_ptr)
+void HttpPullConnection::AddNewTag(const FlvTagBufferPtr& tag_buffer_ptr)
 {
 	connection_ptr_->Send(tag_buffer_ptr->GetBuffer());
 }
 
-void RtmpClientConnection::SetCloseConnectionCallback(const ConnectionCallback& callback)
+void HttpPullConnection::SetCloseConnectionCallback(const ConnectionCallback& callback)
 {
 	close_connection_callback_ = callback;
 }
 
-void RtmpClientConnection::OnConnection(const TcpConnectionPtr& connection_ptr)
+void HttpPullConnection::OnConnection(const TcpConnectionPtr& connection_ptr)
 {
 	if (!connection_ptr->Connected())
 	{

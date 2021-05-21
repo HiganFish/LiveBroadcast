@@ -2,8 +2,8 @@
 // Created by rjd67 on 2020/11/30.
 //
 
-#ifndef LIVEBROADCASTSERVER_RTMPCLIENTCONNECTION_H
-#define LIVEBROADCASTSERVER_RTMPCLIENTCONNECTION_H
+#ifndef LIVEBROADCASTSERVER_HTTPPULLCONNECTION_H
+#define LIVEBROADCASTSERVER_HTTPPULLCONNECTION_H
 
 #include "network/TcpConnection.h"
 #include "utils/codec/FlvCodec.h"
@@ -26,11 +26,11 @@ private:
 };
 typedef std::shared_ptr<FlvTagBuffer> FlvTagBufferPtr;
 
-class RtmpClientConnection
+class HttpPullConnection
 {
 public:
-	explicit RtmpClientConnection(const TcpConnectionPtr& connection_ptr);
-	~RtmpClientConnection();
+	explicit HttpPullConnection(const TcpConnectionPtr& connection_ptr);
+	~HttpPullConnection();
 
 	std::string GetConnectionName() const;
 
@@ -57,4 +57,4 @@ private:
 };
 
 
-#endif //LIVEBROADCASTSERVER_RTMPCLIENTCONNECTION_H
+#endif //LIVEBROADCASTSERVER_HTTPPULLCONNECTION_H
