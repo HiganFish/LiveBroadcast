@@ -17,11 +17,13 @@
  */
 class RtmpPushConnection;
 typedef std::shared_ptr<PullConnection> PullConnectionPtr;
+typedef std::shared_ptr<RtmpPushConnection> RtmpPushConnectionPtr;
+
 typedef std::map<std::string, PullConnectionPtr> PullConnectionMap;
-typedef std::function<void(RtmpPushConnection*)> ShakeHandSuccessCallback;
+typedef std::function<void(const RtmpPushConnectionPtr&)> ShakeHandSuccessCallback;
 typedef std::function<bool(const std::string&, const std::string&)> AuthenticationCallback;
 
-class RtmpPushConnection
+class RtmpPushConnection : public std::enable_shared_from_this<RtmpPushConnection>
 {
 public:
 	enum ShakeHandResult

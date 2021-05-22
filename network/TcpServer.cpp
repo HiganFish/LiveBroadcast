@@ -54,7 +54,10 @@ void TcpServer::OnNewConnection(int sockfd, const InetAddress& address)
 	connection_ptr->SetNewMessageCallback(newmessage_callback_);
 	connection_ptr->SetWriteCompleteCallback(write_complete_callback_);
 	connection_ptr->SetConnectionCallback(connection_callback_);
-	connection_ptr->SetConnectionCloseCallback(std::bind(&TcpServer::OnCloseConnection,this, _1));
+	connection_ptr->SetConnectionCloseCallback([this](auto&& PH)
+	{
+		OnCloseConnection(PH);
+	});
 
 	connection_map_[connection_name] = connection_ptr;
 

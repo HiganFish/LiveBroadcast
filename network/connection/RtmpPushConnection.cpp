@@ -128,7 +128,7 @@ void RtmpPushConnection::OnConnectionShakeHand(const TcpConnectionPtr& connectio
 
 			if (shake_hand_success_callback_)
 			{
-				shake_hand_success_callback_(this);
+				shake_hand_success_callback_(shared_from_this());
 			}
 
 			connection_ptr->SetNewMessageCallback(

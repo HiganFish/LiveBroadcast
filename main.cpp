@@ -11,7 +11,7 @@
 #include "utils/Format.h"
 #include "mapper/UserMapper.h"
 
-std::map<std::string, RtmpPushConnection*> rtmp_connection_map;
+std::map<std::string, RtmpPushConnectionPtr> rtmp_connection_map;
 // UserMapper user_mapper_;
 
 bool OnAuthenticate(const std::string& user, const std::string& passwd)
@@ -29,7 +29,7 @@ bool OnAuthenticate(const std::string& user, const std::string& passwd)
 
 }
 
-void OnShakeHandSuccess(RtmpPushConnection* server_connection)
+void OnShakeHandSuccess(const RtmpPushConnectionPtr& server_connection)
 {
 	/**
 	 * 将推流的url和server_connection关联起来 用于拉流的时候根据url获取对应的server_connection
@@ -52,7 +52,7 @@ void OnConnection(const TcpConnectionPtr& connection_ptr)
 {
 	if (connection_ptr->Connected())
 	{
-		RtmpPushConnection* server_connection = new RtmpPushConnection(connection_ptr);
+		auto server_connection = std::make_shared<RtmpPushConnection>(connection_ptr);
 
 		// 连接建立后RtmpServerConnection内部会进行握手 然后握手成功后调用函数
 		server_connection->SetShakeHandSuccessCallback(OnShakeHandSuccess);
@@ -85,7 +85,7 @@ void OnClientMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Tim
 	 * 来获取到对应的server_connection 加入其中
 	 */
 	std::string url = Format::GetUrl(connection_data);
-	RtmpPushConnection* server_connection = rtmp_connection_map[url];
+	RtmpPushConnectionPtr server_connection = rtmp_connection_map[url];
 
 	if (server_connection)
 	{
@@ -102,6 +102,12 @@ void OnClientMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Tim
 
 		connection_ptr->Shutdown();
 	}
+}
+
+EventLoop* loop_ptr;
+void StopServer(int)
+{
+	loop_ptr->Stop();
 }
 
 int main(int argc, char* argv[])
@@ -123,11 +129,17 @@ int main(int argc, char* argv[])
 //		exit(-1);
 //	}
 
+	struct sigaction sa{};
+	sa.sa_handler = StopServer;
+	sigfillset(&sa.sa_mask);
+	sigaction(SIGINT, &sa , nullptr);
 
 	short main_server_port = atoi(argv[1]);
 	short client_server_port = atoi(argv[2]);
 
 	EventLoop loop;
+	loop_ptr = &loop;
+
 	InetAddress main_server_address(main_server_port, true);
 	InetAddress client_server_address(client_server_port, true);
 	TcpServer main_server(&loop, "main_server", main_server_address);
