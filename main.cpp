@@ -42,6 +42,11 @@ void OnShakeHandSuccess(RtmpPushConnection* server_connection)
 			 << " bind to " << path;
 }
 
+void RemoveRtmpPushConnection(const TcpConnectionPtr& connection_ptr)
+{
+	rtmp_connection_map.erase(connection_ptr->GetConnectionName());
+}
+
 /** 主播建立连接后的回调函数*/
 void OnConnection(const TcpConnectionPtr& connection_ptr)
 {
@@ -65,12 +70,15 @@ void OnConnection(const TcpConnectionPtr& connection_ptr)
 		LOG_INFO << "connection: " << connection_ptr->GetConnectionName()
 				 << " start shake hand";
 	}
+	else
+	{
+		RemoveRtmpPushConnection(connection_ptr);
+	}
 }
 
 void OnClientMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Timestamp timestamp)
 {
 	std::string connection_data = buffer->ReadAllAsString();
-
 
 	/**
 	 * 获取HTTP请求中的url 根据上面设置的映射关系 同样获取url

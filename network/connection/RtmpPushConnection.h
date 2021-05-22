@@ -16,8 +16,8 @@
  * 管理FlvManager的Tag缓冲区 实时替换
  */
 class RtmpPushConnection;
-typedef std::shared_ptr<HttpPullConnection> RtmpClientConnectionPtr;
-typedef std::map<std::string, RtmpClientConnectionPtr> RtmpClientConnectionMap;
+typedef std::shared_ptr<PullConnection> PullConnectionPtr;
+typedef std::map<std::string, PullConnectionPtr> PullConnectionMap;
 typedef std::function<void(RtmpPushConnection*)> ShakeHandSuccessCallback;
 typedef std::function<bool(const std::string&, const std::string&)> AuthenticationCallback;
 
@@ -64,7 +64,7 @@ public:
 	 * 发送头部数据 保存观看者连接
 	 * @param client_connection_ptr
 	 */
-	void AddClientConnection(const RtmpClientConnectionPtr& client_connection_ptr);
+	void AddClientConnection(const PullConnectionPtr& client_connection_ptr);
 
 	void SetShakeHandSuccessCallback(const ShakeHandSuccessCallback& callback);
 
@@ -82,7 +82,7 @@ public:
 private:
 
 	TcpConnectionPtr connection_ptr_;
-	RtmpClientConnectionMap client_connection_map_;
+	PullConnectionMap client_connection_map_;
 
 	RtmpManager rtmp_manager_;
 	FlvManager* flv_manager_;
@@ -113,7 +113,7 @@ private:
 	 * 向一个新加入的连接 发送头部数据
 	 * @param client_connection_ptr 新加入的连接
 	 */
-	void SendHeaderToClientConnection(const RtmpClientConnectionPtr& client_connection_ptr);
+	void SendHeaderToClientConnection(const PullConnectionPtr& client_connection_ptr);
 
 	/**
 	 * 新FlvTag的回调函数

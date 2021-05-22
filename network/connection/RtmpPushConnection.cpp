@@ -166,7 +166,7 @@ void RtmpPushConnection::OnBodyData(const TcpConnectionPtr& connection_ptr, Buff
 }
 
 void RtmpPushConnection::AddClientConnection(
-		const RtmpClientConnectionPtr& client_connection_ptr)
+		const PullConnectionPtr& client_connection_ptr)
 {
 	client_connection_map_[client_connection_ptr->GetConnectionName()]
 		= client_connection_ptr;
@@ -206,17 +206,17 @@ void RtmpPushConnection::SetAuthenticationCallback(const AuthenticationCallback&
 }
 
 void RtmpPushConnection::SendHeaderToClientConnection(
-		const RtmpClientConnectionPtr& client_connection_ptr)
+		const PullConnectionPtr& client_connection_ptr)
 {
 	const Buffer& header_buffer = GetHeaderDataBuffer();
 
-	client_connection_ptr->SendHeader(header_buffer);
+	client_connection_ptr->SendHeaderOnConnection(header_buffer);
 
 	/**
 	 * 头部之后第一个 Tag的PreviousTagSize 需要设置为 头部中最后一个Tag的CurrentSize
 	 */
 	last_flv_tag_ptr_->SetPreviousTagSize(GetLastHeaderTagCurrentSize());
-	client_connection_ptr->AddNewTag(last_flv_tag_ptr_);
+	client_connection_ptr->AddFlvTag(last_flv_tag_ptr_);
 }
 
 void RtmpPushConnection::OnNewFlvTag(const FlvTagPtr& tag_ptr)
@@ -225,7 +225,7 @@ void RtmpPushConnection::OnNewFlvTag(const FlvTagPtr& tag_ptr)
 
 	for (auto& [connection_name, connection_ptr] : client_connection_map_)
 	{
-		connection_ptr->AddNewTag(tag_ptr);
+		connection_ptr->AddFlvTag(tag_ptr);
 	}
 }
 
@@ -253,6 +253,5 @@ bool RtmpPushConnection::Authenticate()
 			return false;
 		}
 	}
-
 	return true;
 }

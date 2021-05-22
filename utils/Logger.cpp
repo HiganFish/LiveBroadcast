@@ -75,8 +75,7 @@ Logger::Impl::Impl(Logger::LogLevel level, const char* file_name, int line):
 {
 	FormatTime();
 
-	// TODO stream_ << CurrentThread::GetTid() << ' ';
-	stream_ << 123456 << ' ';
+	stream_ << CurrentThread::GetTid() << ' ';
 	stream_ << std::string_view(LogLevelStr[static_cast<int>(level)], 6);
 }
 

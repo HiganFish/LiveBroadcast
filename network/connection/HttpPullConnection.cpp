@@ -9,12 +9,7 @@ HttpPullConnection::HttpPullConnection(const TcpConnectionPtr& connection_ptr):
 	connection_ptr_(connection_ptr)
 {
 	connection_ptr_->SetConnectionCallback(
-			[this](auto&& PH1){OnConnection(PH1);});
-}
-
-HttpPullConnection::~HttpPullConnection()
-{
-
+		[this](auto&& PH1){OnConnection(PH1);});
 }
 
 std::string HttpPullConnection::GetConnectionName() const
@@ -30,7 +25,7 @@ constexpr char response_header[] = "HTTP/1.1 200 OK\r\n"
                               "Connection: keep-alive\r\n"
                               "Access-Control-Allow-Origin: *\r\n\r\n";
 
-void HttpPullConnection::SendHeader(const Buffer& buffer)
+void HttpPullConnection::SendHeaderOnConnection(const Buffer& buffer)
 {
 	std::string length_rn = Format::ToHexStringWithCrlf(buffer.ReadableLength());
 	Buffer temp_buffer;
@@ -44,7 +39,7 @@ void HttpPullConnection::SendHeader(const Buffer& buffer)
 	connection_ptr_->Send(temp_buffer);
 }
 
-void HttpPullConnection::AddNewTag(const FlvTagPtr& flv_tag_ptr)
+void HttpPullConnection::AddFlvTag(const FlvTagPtr& flv_tag_ptr)
 {
 	std::string length_rn = Format::ToHexStringWithCrlf(flv_tag_ptr->GetSumSize());
 	Buffer temp_buffer;
@@ -54,11 +49,6 @@ void HttpPullConnection::AddNewTag(const FlvTagPtr& flv_tag_ptr)
 	temp_buffer.AppendData("\r\n");
 
 	connection_ptr_->Send(temp_buffer);
-}
-
-void HttpPullConnection::SetCloseConnectionCallback(const ConnectionCallback& callback)
-{
-	close_connection_callback_ = callback;
 }
 
 void HttpPullConnection::OnConnection(const TcpConnectionPtr& connection_ptr)
