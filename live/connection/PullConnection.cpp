@@ -2,7 +2,7 @@
 // Created by rjd67 on 2021/5/21.
 //
 
-#include "network/connection/PullConnection.h"
+#include "live/connection/PullConnection.h"
 
 void PullConnection::SetCloseConnectionCallback(const ConnectionCallback& callback)
 {

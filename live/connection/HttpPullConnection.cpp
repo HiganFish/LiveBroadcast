@@ -2,7 +2,7 @@
 // Created by rjd67 on 2020/11/30.
 //
 
-#include "network/connection/HttpPullConnection.h"
+#include "live/connection/HttpPullConnection.h"
 #include "utils/Format.h"
 
 HttpPullConnection::HttpPullConnection(const TcpConnectionPtr& connection_ptr):

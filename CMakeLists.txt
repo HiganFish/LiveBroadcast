@@ -28,10 +28,13 @@ set(NETWORK_SRCS
 		network/EventLoopThreadPool.cpp
 		)
 
-set(CONN_SRCS
-		network/connection/RtmpPushConnection.cpp
-		network/connection/PullConnection.cpp
-		network/connection/HttpPullConnection.cpp
+set(LIVE_SRCS
+		live/connection/RtmpPushConnection.cpp
+		live/connection/PullConnection.cpp
+		live/connection/HttpPullConnection.cpp
+
+		live/RtmpPushServer.cpp
+		live/HttpPullServer.cpp
 		)
 
 set(UTILS_SRCS
@@ -89,7 +92,7 @@ add_library(lbs_db_lib ${DB_SRCS})
 target_link_libraries(lbs_db_lib mysqlclient)
 target_link_libraries(lbs_db_lib lbs_base_lib)
 
-add_library(lib_conn_lib ${CONN_SRCS})
+add_library(lib_conn_lib ${LIVE_SRCS})
 
 add_executable(LiveBroadcastServer main.cpp)
 target_link_libraries(LiveBroadcastServer lbs_net_lib lib_conn_lib)

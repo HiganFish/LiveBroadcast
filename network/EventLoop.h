@@ -11,7 +11,7 @@ class EventLoop
 public:
 	typedef std::function<void()> EventLoopFunction;
 
-	EventLoop();
+	EventLoop() noexcept;
 	~EventLoop();
 
 	void Loop();

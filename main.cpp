@@ -2,16 +2,13 @@
 //
 #include <iostream>
 #include <csignal>
+#include "live/RtmpPushServer.h"
+#include "live/HttpPullServer.h"
 
-#include "network/TcpServer.h"
-#include "network/EventLoop.h"
-#include "utils/codec/RtmpManager.h"
-#include "network/connection/RtmpPushConnection.h"
 #include "utils/Logger.h"
-#include "utils/Format.h"
-#include "mapper/UserMapper.h"
 
-std::map<std::string, RtmpPushConnectionPtr> rtmp_connection_map;
+#ifdef ENABLE_MAPPER
+#include "mapper/UserMapper.h"
 // UserMapper user_mapper_;
 
 bool OnAuthenticate(const std::string& user, const std::string& passwd)
@@ -26,132 +23,57 @@ bool OnAuthenticate(const std::string& user, const std::string& passwd)
 //		LOG_WARN << "user: " << user << ", use wrong passwd: " << passwd;
 //		return false;
 //	}
-
 }
+#endif
 
-void OnShakeHandSuccess(const RtmpPushConnectionPtr& server_connection)
-{
-	/**
-	 * 将推流的url和server_connection关联起来 用于拉流的时候根据url获取对应的server_connection
-	 *
-	 * rtmp到server_connection 映射关系可以自己修改
-	 */
-	std::string path = server_connection->GetRtmpPath();
-	rtmp_connection_map[path] = server_connection;
-	LOG_INFO << "server: " << server_connection->GetConnectionName()
-			 << " bind to " << path;
-}
-
-void RemoveRtmpPushConnection(const TcpConnectionPtr& connection_ptr)
-{
-	rtmp_connection_map.erase(connection_ptr->GetConnectionName());
-}
-
-/** 主播建立连接后的回调函数*/
-void OnConnection(const TcpConnectionPtr& connection_ptr)
-{
-	if (connection_ptr->Connected())
-	{
-		auto server_connection = std::make_shared<RtmpPushConnection>(connection_ptr);
-
-		// 连接建立后RtmpServerConnection内部会进行握手 然后握手成功后调用函数
-		server_connection->SetShakeHandSuccessCallback(OnShakeHandSuccess);
-		server_connection->SetAuthenticationCallback(OnAuthenticate);
-
-		/**
-		 * 连接建立后 设置握手回调函数
-		 */
-		connection_ptr->SetNewMessageCallback(
-				[server_connection](auto && PH1, auto && PH2, auto && PH3)
-				{
-					server_connection->OnConnectionShakeHand(PH1, PH2, PH3);
-				});
-
-		LOG_INFO << "connection: " << connection_ptr->GetConnectionName()
-				 << " start shake hand";
-	}
-	else
-	{
-		RemoveRtmpPushConnection(connection_ptr);
-	}
-}
-
-void OnClientMessage(const TcpConnectionPtr& connection_ptr, Buffer* buffer, Timestamp timestamp)
-{
-	std::string connection_data = buffer->ReadAllAsString();
-
-	/**
-	 * 获取HTTP请求中的url 根据上面设置的映射关系 同样获取url
-	 * 来获取到对应的server_connection 加入其中
-	 */
-	std::string url = Format::GetUrl(connection_data);
-	RtmpPushConnectionPtr server_connection = rtmp_connection_map[url];
-
-	if (server_connection)
-	{
-		LOG_INFO << "connection: " << connection_ptr->GetConnectionName()
-				 << ", request url: " << url << " success";
-
-		server_connection->AddClientConnection(
-				std::make_shared<HttpPullConnection>(connection_ptr));
-	}
-	else
-	{
-		LOG_INFO << "connection: "<< connection_ptr->GetConnectionName()
-				 << ", request url: " << url << " failed";
-
-		connection_ptr->Shutdown();
-	}
-}
-
-EventLoop* loop_ptr;
+EventLoop loop;
 void StopServer(int)
 {
-	loop_ptr->Stop();
+	loop.Stop();
+}
+
+void InitSignal()
+{
+	struct sigaction sa{};
+	sa.sa_handler = StopServer;
+	sigfillset(&sa.sa_mask);
+	sigaction(SIGINT, &sa , nullptr);
+	signal(SIGPIPE, SIG_IGN);
 }
 
 int main(int argc, char* argv[])
 {
-
-#ifndef _WIN32
-	signal(SIGPIPE, SIG_IGN);
-#endif
-
 	if (argc != 3)
 	{
 		printf("wrong number of parameters\r\n");
 		exit(-1);
 	}
-
+#ifdef ENABLE_MAPPER
 //	if (!user_mapper_.Initialize(
 //			"127.0.0.1", "lsmg", "123456789", "live"))
 //	{
 //		exit(-1);
 //	}
+#endif
 
-	struct sigaction sa{};
-	sa.sa_handler = StopServer;
-	sigfillset(&sa.sa_mask);
-	sigaction(SIGINT, &sa , nullptr);
+	InitSignal();
 
-	short main_server_port = atoi(argv[1]);
-	short client_server_port = atoi(argv[2]);
+	InetAddress rtmp_server_address(argv[1], true);
+	InetAddress client_server_address(argv[2], true);
 
-	EventLoop loop;
-	loop_ptr = &loop;
+	RtmpPushServer rtmp_push_server(&loop, "rtmp_push_server", rtmp_server_address);
+	rtmp_push_server.SetThreadNum(2);
 
-	InetAddress main_server_address(main_server_port, true);
-	InetAddress client_server_address(client_server_port, true);
-	TcpServer main_server(&loop, "main_server", main_server_address);
-	TcpServer client_server(&loop, "client_server", client_server_address);
+	HttpPullServer http_pull_server(&loop, "http_pull_server", client_server_address);
+	http_pull_server.SetThreadNum(4);
 
-	main_server.SetConnectionCallback(OnConnection);
-	client_server.SetNewMessageCallback(OnClientMessage);
+	http_pull_server.SetGetPushConnCallback([server = &rtmp_push_server](auto&& PH1)
+	{
+		return server->GetPushConnByUrl(PH1);
+	});
 
-	main_server.SetThreadNum(2);
-	client_server.SetThreadNum(4);
+	rtmp_push_server.Start();
+	http_pull_server.Start();
 
-	main_server.Start();
-	client_server.Start();
 	loop.Loop();
 }

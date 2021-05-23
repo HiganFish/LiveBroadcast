@@ -13,6 +13,12 @@ InetAddress::InetAddress(sockaddr_in6 addr)
 	addr_ipv6 = addr;
 }
 
+InetAddress::InetAddress(const char* port, bool ipv6):
+	InetAddress(atoi(port), ipv6)
+{
+
+}
+
 InetAddress::InetAddress(uint16_t port, bool ipv6) :
 	family_(ipv6 ? AF_INET6 : AF_INET)
 {

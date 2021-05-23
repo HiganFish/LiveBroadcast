@@ -5,7 +5,7 @@
 #include "network/multiplexing/Select.h"
 #include "thread/CurrentThread.h"
 
-EventLoop::EventLoop() :
+EventLoop::EventLoop() noexcept :
 	multiplexing_base_(nullptr),
 	active_channels_(),
 	looping_(false),

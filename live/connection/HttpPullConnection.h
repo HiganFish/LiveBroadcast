@@ -7,7 +7,7 @@
 
 #include "network/TcpConnection.h"
 #include "utils/codec/FlvCodec.h"
-#include "network/connection/PullConnection.h"
+#include "live/connection/PullConnection.h"
 
 class HttpPullConnection : public PullConnection
 {

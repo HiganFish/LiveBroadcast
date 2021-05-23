@@ -17,7 +17,7 @@ TcpServer::~TcpServer()
 {
 	for (auto [connection_name, connection_ptr] : connection_map_)
 	{
-		LOG_INFO << "close connection: %s" << connection_name;
+		LOG_INFO << "close connection: " << connection_name;
 		connection_ptr->ConnectDestroyed();
 	}
 }
